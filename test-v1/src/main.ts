@@ -12,6 +12,7 @@ const scope = "user-read-private user-read-email";
 
 const authUrl = new URL("https://accounts.spotify.com/authorize");
 const tokenUrl = "https://accounts.spotify.com/api/token";
+const profileUrl = "https://api.spotify.com/v1/me";
 
 // code example
 //https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
@@ -39,7 +40,8 @@ const tokenUrl = "https://accounts.spotify.com/api/token";
   };
 
   // login button
-  document.addEventListener("click", spotifyAuthorize, false);
+  const login_btn = document.getElementById("login_button");
+  if (login_btn) login_btn.addEventListener("click", spotifyAuthorize, false);
 
   async function spotifyAuthorize(e: Event) {
     const codeVerifier = generateRandomString(64);
@@ -101,6 +103,22 @@ const tokenUrl = "https://accounts.spotify.com/api/token";
 
   if (code) {
     getToken(code);
+  }
+
+  const profile_btn = document.getElementById("profile_button");
+  if (profile_btn) profile_btn.addEventListener("click", getProfile, false);
+
+  async function getProfile() {
+    let accessToken = localStorage.getItem("access_token");
+
+    const response = await fetch(profileUrl, {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    });
+
+    const data = await response.json();
+    console.log(data);
   }
 
   console.log("code", code);
