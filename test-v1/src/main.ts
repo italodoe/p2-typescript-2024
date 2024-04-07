@@ -38,14 +38,13 @@ const tokenUrl = "https://accounts.spotify.com/api/token";
       .replace(/\//g, "_");
   };
 
-
   // login button
   document.addEventListener("click", spotifyAuthorize, false);
 
   async function spotifyAuthorize(e: Event) {
     const codeVerifier = generateRandomString(64);
-     const hashed = await sha256(codeVerifier)
-     const codeChallenge = base64encode(hashed)
+    const hashed = await sha256(codeVerifier);
+    const codeChallenge = base64encode(hashed);
 
     window.localStorage.setItem("code_verifier", codeVerifier);
 
@@ -63,36 +62,39 @@ const tokenUrl = "https://accounts.spotify.com/api/token";
   }
 
   const getToken = async (code: string) => {
-     const codeVerifier = localStorage.getItem("code_verifier");
- 
-    const payload = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        client_id: clientId,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: codeVerifier,
-      }),
-    };
+    const codeVerifier = localStorage.getItem("code_verifier");
+    if (codeVerifier) {
+      const params = new URLSearchParams();
+      params.append("client_id", clientId);
+      params.append("grant_type", "authorization_code");
+      params.append("code", code);
+      params.append("redirect_uri", redirectUri);
+      params.append("code_verifier", codeVerifier);
 
-    const body = await fetch(tokenUrl, payload);
-    const response = await body.json();
+      const payload = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params,
+      };
 
-    console.log(response);
-    localStorage.setItem("access_token", response.access_token);
+      const body = await fetch(tokenUrl, payload);
+      const response = await body.json();
+
+      setTokenResponse(response);
+
+      console.log("getToken", response);
+    }
   };
 
-  // constants
-  const access_token = localStorage.getItem("access_token") || null;
-  const refresh_token = localStorage.getItem("refresh_token") || null;
-  const expires_at = localStorage.getItem("expires_at") || null;
-  const codeVerifier = localStorage.getItem("code_verifier") || null;
-
-
+  const setTokenResponse = (response) => {
+    const t = new Date();
+    let expires_at = t.setSeconds(t.getSeconds() + response.expires_in);
+    localStorage.setItem("access_token", response.access_token);
+    localStorage.setItem("refresh_token", response.refresh_token);
+    localStorage.setItem("expires_at", String(expires_at));
+  };
 
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code") || null;
@@ -100,13 +102,10 @@ const tokenUrl = "https://accounts.spotify.com/api/token";
   if (code) {
     getToken(code);
   }
- 
+
   console.log("code", code);
-  console.log("access_token", access_token);
-  console.log("refresh_token", refresh_token);
-  console.log("expires_at", expires_at);
-  console.log("codeVerifier", codeVerifier);
 })();
+
 function logout() {
   localStorage.clear();
   window.location.reload();
