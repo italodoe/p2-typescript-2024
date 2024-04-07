@@ -9,20 +9,12 @@ const clientSecret = "37a24864fdae4aa0a538460df473796d";
 const redirectUri = "http://localhost:5173/";
 
 const scope = "user-read-private user-read-email";
-const authUrl = new URL("https://accounts.spotify.com/authorize");
 
+const authUrl = new URL("https://accounts.spotify.com/authorize");
 const tokenUrl = "https://accounts.spotify.com/api/token";
 
-
-const access_token = localStorage.getItem("access_token") || null;
-const refresh_token = localStorage.getItem("refresh_token") || null;
-const expires_at = localStorage.getItem("expires_at") || null;
-
-const urlParams = new URLSearchParams(window.location.search);
-const code = urlParams.get("code") || null;
-
 // code example
-//https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow 
+//https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
 
 (function () {
   //code verification
@@ -46,17 +38,14 @@ const code = urlParams.get("code") || null;
       .replace(/\//g, "_");
   };
 
-  async function generateCodeChanllenge(codeVerifier: string) {
-    const hashed = await sha256(codeVerifier);
-    return base64encode(hashed);
-  }
 
   // login button
   document.addEventListener("click", spotifyAuthorize, false);
 
-  function spotifyAuthorize(e: Event) {
+  async function spotifyAuthorize(e: Event) {
     const codeVerifier = generateRandomString(64);
-    const codeChallenge = generateCodeChanllenge(codeVerifier);
+     const hashed = await sha256(codeVerifier)
+     const codeChallenge = base64encode(hashed)
 
     window.localStorage.setItem("code_verifier", codeVerifier);
 
@@ -74,9 +63,8 @@ const code = urlParams.get("code") || null;
   }
 
   const getToken = async (code: string) => {
-    // stored in the previous step
-    let codeVerifier = localStorage.getItem("code_verifier");
-
+     const codeVerifier = localStorage.getItem("code_verifier");
+ 
     const payload = {
       method: "POST",
       headers: {
@@ -95,13 +83,31 @@ const code = urlParams.get("code") || null;
     const response = await body.json();
 
     console.log(response);
-
     localStorage.setItem("access_token", response.access_token);
   };
 
+  // constants
+  const access_token = localStorage.getItem("access_token") || null;
+  const refresh_token = localStorage.getItem("refresh_token") || null;
+  const expires_at = localStorage.getItem("expires_at") || null;
+  const codeVerifier = localStorage.getItem("code_verifier") || null;
 
+
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get("code") || null;
+
+  if (code) {
+    getToken(code);
+  }
+ 
   console.log("code", code);
   console.log("access_token", access_token);
   console.log("refresh_token", refresh_token);
   console.log("expires_at", expires_at);
+  console.log("codeVerifier", codeVerifier);
 })();
+function logout() {
+  localStorage.clear();
+  window.location.reload();
+}
