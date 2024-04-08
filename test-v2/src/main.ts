@@ -4,10 +4,16 @@ import "./style.css";
 (function () {
   const tendingUrl = "https://api.giphy.com/v1/gifs/trending?";
   const searchUrl = "https://api.giphy.com/v1/gifs/search?";
-  var query;
+  const inputSearch = document.getElementById("search_input");
+  const app = document.getElementById("app");
+  const offsetMinMax = { min: 0, max: 49999 };
 
+  const randomBetween = (from: number, to: number) => {
+    return Math.floor(Math.random() * (to - from + 1) + from);
+  };
+  
   const params = {
-    //  q: query, //for search
+    q: null, //for search
     // rating: pg, //rating: g, pg, pg-13
     // offset: pg, //Default: “0” Maximum: “4999”
     limit: 10,
@@ -28,26 +34,39 @@ import "./style.css";
     console.log("response--", response);
   }
 
-  function getTrending() {
+  function getTrending(e: Event) {
+    e.preventDefault();
+
     callApiGetTrending();
   }
 
   // get by search
   const search_button = document.getElementById("search_button");
-  if (search_button)
-    search_button.addEventListener("click", getSearch, false);
+  if (search_button) search_button.addEventListener("click", getSearch, false);
 
-  async function callApiGetSearch() {
-    params.q = "rick and morty";
+  async function callApiGetSearch(search_term: string, callback: any) {
+    params.q = search_term;
     const body = await fetch(searchUrl + new URLSearchParams(params));
     const response = await body.json();
     console.log("response--", response);
+    if (response && callback) callback(response);
   }
 
-  function getSearch() {
-    callApiGetSearch();
+  function getSearch(e: Event) {
+    e.preventDefault();
+    const search_term = inputSearch?.value;
+    if (search_term !== "") callApiGetSearch(search_term, render);
   }
 
-
-
+  const render = (response) => {
+    console.log(response);
+    const limit = response.data.length;
+    for (let i = 0; i < limit; ++i) {
+      console.log("response.data", response.data[i].images);
+      let img = document.createElement("img");
+      img.src = response.data[i].images.fixed_height.url;
+      app?.appendChild(img);
+    }
+  };
 })();
+
