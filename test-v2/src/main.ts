@@ -11,7 +11,7 @@ import "./style.css";
   const randomBetween = (from: number, to: number) => {
     return Math.floor(Math.random() * (to - from + 1) + from);
   };
-  
+
   const params = {
     q: null, //for search
     // rating: pg, //rating: g, pg, pg-13
@@ -31,13 +31,15 @@ import "./style.css";
     delete params.q;
     const body = await fetch(tendingUrl + new URLSearchParams(params));
     const response = await body.json();
+    return response;
     console.log("response--", response);
   }
 
-  function getTrending(e: Event) {
+  async function getTrending(e: Event) {
     e.preventDefault();
 
-    callApiGetTrending();
+    const trends = await callApiGetTrending();
+    render(trends, true);
   }
 
   // get by search
@@ -58,9 +60,11 @@ import "./style.css";
     if (search_term !== "") callApiGetSearch(search_term, render);
   }
 
-  const render = (response) => {
+  const render = (response, clean: boolean = false) => {
     console.log(response);
     const limit = response.data.length;
+    if (clean) app.textContent = "";
+
     for (let i = 0; i < limit; ++i) {
       console.log("response.data", response.data[i].images);
       let img = document.createElement("img");
@@ -69,4 +73,3 @@ import "./style.css";
     }
   };
 })();
-
