@@ -1,0 +1,1 @@
+export const RapidAPI_Key = "30972415c6msh9a231608718e0dbp185b14jsna7899253c9fa";
