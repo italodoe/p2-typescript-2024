@@ -1,5 +1,32 @@
 import "./style.css";
 import { YOUTUBE_key } from "./env.ts";
+var interval;
+var isIntervalActive;
+
+//header effects
+const changeBackgroundVideo = () => {
+  interval = setInterval(() => {
+    isIntervalActive = true;
+    const videoBg = document.getElementById("header_back_video");
+    const videoPaths = videoBg?.dataset.sources?.split("|");
+    const videoIndex = videoBg?.dataset.index;
+    if (videoIndex && videoPaths) {
+      let videoIndexInt =
+        parseInt(videoIndex) + 1 >= videoPaths.length
+          ? 0
+          : parseInt(videoIndex) + 1;
+      videoBg.src = videoPaths[videoIndex];
+      videoBg.dataset.index = videoIndexInt;
+      console.log(videoBg);
+      console.log(videoPaths);
+      console.log(videoIndexInt);
+      console.log(videoPaths[videoIndex]);
+    }
+
+  }, 25000);
+};
+
+
 
 //youtube
 const search_form = document.getElementById("search_form");
@@ -18,8 +45,7 @@ const yt_params = {
   videoEmbeddable: true,
 };
 
-if (search_form)
-  search_form.addEventListener("submit", searchHandler, false);
+if (search_form) search_form.addEventListener("submit", searchHandler, false);
 
 async function searchHandler(e: Event) {
   console.log(e);
@@ -90,3 +116,5 @@ function embed(video) {
   app?.append(title);
   app?.append(description);
 }
+
+changeBackgroundVideo();
