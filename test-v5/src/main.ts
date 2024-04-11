@@ -1,9 +1,8 @@
 import "./style.css";
+import { GENIUS_clientId, GENIUS_clientSecret } from "../env.js";
 
-const clientId =
-  "IjOQ1jqu0XIf6WrpH5VLL66AoGVND9VIVcYcnDVAkdqDsUkrAb3dPWxouEIsYU-z";
-const clientSecret =
-  "YrR9bbq8QGJqiwrfaO7iluYTtF7bHljXx-oXG65kLAMrzNJ5U_3_JN28JmMHlAS7vRC9e1-fgmoHRQn5AMrdDA";
+const clientId = GENIUS_clientId;
+const clientSecret = GENIUS_clientSecret;
 // const accessToken = 'rfsEJ1Qd8Xkr3RF3mo8Zz4VA0VoVn-KNGraoeBsVpUmkBXp-meIM6iWB5F0F8qeG';
 const authUrl = "https://api.genius.com/oauth/token";
 
