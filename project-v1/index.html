@@ -7,13 +7,40 @@
     <title>Project v1</title>
   </head>
   <body>
-    <div class="wrapper">
-      <div class="header">
-        <input id="search_input" placeholder="Search" />
-        <button id="search_button">Search</button>
-      </div>
+    <header class="header">
+      <div class="header-wrapper">
+        <h1 class="header-h1">Search in Youtube</h1>
+        <h2 class="header-h2">Whatever you want</h2>
+        <form class="header-form" id="search_form">
+          <input
+            type="text"
+            id="search_input"
+            class="header-input"
+            placeholder="Search..."
+          />
 
-      <div class="thumbnails ">
+          <button type="submit" id="search_button" class="header-search">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="search-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <div class="wrapper">
+      <div class="thumbnails">
         <div id="app"></div>
       </div>
     </div>

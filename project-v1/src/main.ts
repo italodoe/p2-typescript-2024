@@ -2,6 +2,7 @@ import "./style.css";
 import { YOUTUBE_key } from "./env.ts";
 
 //youtube
+const search_form = document.getElementById("search_form");
 const search_button = document.getElementById("search_button");
 const search_input = document.getElementById("search_input");
 const youtubeSearchUrl = "https://www.googleapis.com/youtube/v3/search?";
@@ -17,11 +18,12 @@ const yt_params = {
   videoEmbeddable: true,
 };
 
-if (search_button)
-  search_button.addEventListener("click", searchHandler, false);
+if (search_form)
+  search_form.addEventListener("submit", searchHandler, false);
 
 async function searchHandler(e: Event) {
-  e.preventDefault;
+  console.log(e);
+  e.preventDefault();
   yt_params.q = search_input?.value;
   const response = await youtubeSearchApi();
   addThumbnails(response);
