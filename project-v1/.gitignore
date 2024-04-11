@@ -25,3 +25,4 @@ dist-ssr
 
 #APi key
 env.js
+src/env.ts
