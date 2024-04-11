@@ -19,7 +19,7 @@ const changeBackgroundVideo = () => {
       videoBg.src = videoSource + String(videoBgArrayIndex.pop()) + ".mp4";
       console.log(videoBg.src);
     }
-  }, 5000);
+  }, 8000);
 };
 
 function setSearchedFlag() {
