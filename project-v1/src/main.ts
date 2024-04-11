@@ -2,31 +2,31 @@ import "./style.css";
 import { YOUTUBE_key } from "./env.ts";
 var interval;
 var isIntervalActive;
+var videoBgArrayIndex: number[] = [];
 
 //header effects
 const changeBackgroundVideo = () => {
   interval = setInterval(() => {
     isIntervalActive = true;
     const videoBg = document.getElementById("header_back_video");
-    const videoPaths = videoBg?.dataset.sources?.split("|");
-    const videoIndex = videoBg?.dataset.index;
-    if (videoIndex && videoPaths) {
-      let videoIndexInt =
-        parseInt(videoIndex) + 1 >= videoPaths.length
-          ? 0
-          : parseInt(videoIndex) + 1;
-      videoBg.src = videoPaths[videoIndex];
-      videoBg.dataset.index = videoIndexInt;
-      console.log(videoBg);
-      console.log(videoPaths);
-      console.log(videoIndexInt);
-      console.log(videoPaths[videoIndex]);
-    }
+    const videoSource = videoBg?.dataset.source;
+    const videoMaxIndex = videoBg?.dataset.maxindex;
 
-  }, 25000);
+    if (videoMaxIndex) {
+      if (videoBgArrayIndex.length === 0)
+        videoBgArrayIndex = Array.from(Array(parseInt(videoMaxIndex)).keys());
+      videoBgArrayIndex.sort(() => 0.5 - Math.random());
+      videoBg.src = videoSource + String(videoBgArrayIndex.pop()) + ".mp4";
+      console.log(videoBg.src);
+    }
+  }, 5000);
 };
 
-
+function setSearchedFlag() {
+  const searchClassName = "searched";
+  const bg = document.getElementById("header_back_wrapper");
+  bg?.classList.add(searchClassName);
+}
 
 //youtube
 const search_form = document.getElementById("search_form");
@@ -41,7 +41,7 @@ const yt_params = {
   key: YOUTUBE_key,
   part: "snippet",
   type: "video",
-  maxResults: 10,
+  maxResults: 50,
   videoEmbeddable: true,
 };
 
@@ -64,6 +64,7 @@ async function youtubeSearchApi() {
 
 const addThumbnails = (response) => {
   const itemsArray = response.items;
+  cleanApp();
 
   itemsArray.forEach(function (video, index) {
     console.log(video, index);
@@ -75,6 +76,9 @@ const addThumbnails = (response) => {
     // const videoChannelTitle = snippet.channelTitle;
     // const videoPublishTime = snippet.publishTime;
     console.log(videoThumbnail);
+    const div = document.createElement("div");
+    div.className = "yt-thumbnail-wrapper";
+
     const a = document.createElement("a");
     a.className = "yt-thumbnail";
     a.href = videoEmbedUrl + videoId;
@@ -86,9 +90,16 @@ const addThumbnails = (response) => {
     const title = document.createElement("h3");
     title.textContent = videoTitle;
 
+    const divBg = document.createElement("div");
+    divBg.className = "yt-thumbnail-bg";
+
     a.append(img);
     a.append(title);
-    app?.append(a);
+    div.append(a);
+    div.append(divBg);
+    app?.append(div);
+
+    setSearchedFlag();
   });
 };
 
@@ -115,6 +126,10 @@ function embed(video) {
   app?.append(iframe);
   app?.append(title);
   app?.append(description);
+}
+
+function cleanApp() {
+  if (app) app.textContent = "";
 }
 
 changeBackgroundVideo();
