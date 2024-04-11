@@ -48,44 +48,12 @@ async function serchAll() {
   const searchUrl = `https://api.genius.com/search?`;
   const params = new URLSearchParams();
   params.append("q", searchTerm);
+  params.append("access_token", String(authToken));
 
   console.log(searchUrl + params);
 
-  const response = await fetch(searchUrl + params, {
-     headers: {
-      Authorization: "Bearer " + authToken,
-    },
-  });
+  const response = await fetch(searchUrl + params);
 
   const data = await response.json();
   console.log(data);
 }
-
-// const authHeaders = {
-//   "Content-Type": "application/x-www-form-urlencoded",
-//   Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
-// };
-// const authData = {
-//   grant_type: "client_credentials",
-// };
-// const authToken = await fetch(authUrl, {
-//   method: "POST",
-//   headers: authHeaders,
-//   body: new URLSearchParams(authData),
-// })
-//   .then((response) => response.json())
-//   .then((data) => data.access_token);
-
-// const searchTerm = "Kendrick Lamar";
-// const searchUrl = `https://api.genius.com/search?q=${encodeURIComponent(
-//   searchTerm
-// )}`;
-// const searchHeaders = {
-//   Authorization: `Bearer ${authToken}`,
-// };
-// const searchResults = await fetch(searchUrl, {
-//   headers: searchHeaders,
-// })
-//   .then((response) => response.json())
-//   .then((data) => data.response.hits);
-// console.log(searchResults);
