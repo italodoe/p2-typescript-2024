@@ -43,6 +43,7 @@ const yt_params = {
   type: "video",
   maxResults: 50,
   videoEmbeddable: true,
+  pageToken: undefined
 };
 
 if (search_form) search_form.addEventListener("submit", searchHandler, false);
@@ -52,19 +53,29 @@ async function searchHandler(e: Event) {
   e.preventDefault();
   yt_params.q = search_input?.value;
   const response = await youtubeSearchApi();
+  const nextPageToken = response.nextPageToken;
+  const response2 = await youtubeSearchApi(nextPageToken);
+  console.log('response2',response2);
   addThumbnails(response);
+ addThumbnails(response2, false);
 }
 
-async function youtubeSearchApi() {
+async function youtubeSearchApi(nextPageToken = null) {
+  delete yt_params.pageToken;
+  if (nextPageToken) {
+    yt_params.pageToken = nextPageToken;
+  }
   const body = await fetch(youtubeSearchUrl + new URLSearchParams(yt_params));
   const response = await body.json();
   console.log("response--", response);
+
   return response;
 }
 
-const addThumbnails = (response) => {
+const addThumbnails = (response, clear = true) => {
   const itemsArray = response.items;
-  cleanApp();
+  if (clear)
+    clearApp();
 
   itemsArray.forEach(function (video, index) {
     console.log(video, index);
@@ -128,7 +139,7 @@ function embed(video) {
   app?.append(description);
 }
 
-function cleanApp() {
+function clearApp() {
   if (app) app.textContent = "";
 }
 
