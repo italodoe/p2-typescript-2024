@@ -6,7 +6,7 @@ var videoBgArrayIndex: number[] = [];
 const localKeyArray: string[] = [];
 var ytItemsArray: JSON[] = [];
 const ytMaxCalls = 5; //max reloads for the same query
-
+var currentTimeOffset = 0;
 //header effects
 const changeBackgroundVideo = setInterval(() => {
   isIntervalActive = true;
@@ -18,9 +18,11 @@ const changeBackgroundVideo = setInterval(() => {
     if (videoBgArrayIndex.length === 0) {
       videoBgArrayIndex = Array.from(Array(parseInt(videoMaxIndex)).keys());
       videoBgArrayIndex.sort(() => 0.5 - Math.random());
+      currentTimeOffset += 2;
+      if (currentTimeOffset > 20) currentTimeOffset = 0;
     }
     videoBg.src = videoSource + String(videoBgArrayIndex.pop()) + ".mp4";
-    
+    videoBg.currentTime = currentTimeOffset;
     console.log("changeBackgroundVideo", videoBg.src);
     console.log(videoBgArrayIndex);
   }
