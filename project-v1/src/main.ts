@@ -55,7 +55,9 @@ async function searchHandler(e: Event) {
   const response = await youtubeSearchApi();
   const nextPageToken = response.nextPageToken;
   const response2 = await youtubeSearchApi(nextPageToken);
+  
   console.log("response2", response2);
+
   addThumbnails(response);
   addThumbnails(response2, false);
 }
