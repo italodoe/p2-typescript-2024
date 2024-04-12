@@ -23,7 +23,7 @@
 }
 
 /* Footer */
-footer{
+footer {
   position: absolute;
   bottom: 0;
   font-size: 0.65rem;
@@ -34,7 +34,7 @@ footer{
   align-content: center;
   align-items: center;
 }
-.copyrigth-sym{
+.copyrigth-sym {
   font-size: 1.125rem;
   margin: 5px 5px;
   border: 1px solid white;
@@ -46,7 +46,6 @@ footer{
   justify-content: center;
   align-items: center;
 }
-
 
 /* Header */
 
@@ -94,8 +93,7 @@ footer{
   right: 0;
   z-index: 1;
 }
-.header-back.searched{
-
+.header-back.searched {
   filter: blur(25px);
 }
 .header-back.searched:after {

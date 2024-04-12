@@ -43,7 +43,7 @@ const yt_params = {
   type: "video",
   maxResults: 50,
   videoEmbeddable: true,
-  pageToken: undefined
+  pageToken: undefined,
 };
 
 if (search_form) search_form.addEventListener("submit", searchHandler, false);
@@ -55,9 +55,9 @@ async function searchHandler(e: Event) {
   const response = await youtubeSearchApi();
   const nextPageToken = response.nextPageToken;
   const response2 = await youtubeSearchApi(nextPageToken);
-  console.log('response2',response2);
+  console.log("response2", response2);
   addThumbnails(response);
- addThumbnails(response2, false);
+  addThumbnails(response2, false);
 }
 
 async function youtubeSearchApi(nextPageToken = null) {
@@ -74,8 +74,7 @@ async function youtubeSearchApi(nextPageToken = null) {
 
 const addThumbnails = (response, clear = true) => {
   const itemsArray = response.items;
-  if (clear)
-    clearApp();
+  if (clear) clearApp();
 
   itemsArray.forEach(function (video, index) {
     console.log(video, index);
