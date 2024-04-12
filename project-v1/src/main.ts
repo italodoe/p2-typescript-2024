@@ -5,7 +5,7 @@ var isIntervalActive;
 var videoBgArrayIndex: number[] = [];
 const localKeyArray: string[] = [];
 var ytItemsArray: JSON[] = [];
-const ytMaxCalls = 5; //max reloads for the same query  
+const ytMaxCalls = 5; //max reloads for the same query
 
 //header effects
 const changeBackgroundVideo = setInterval(() => {
@@ -15,11 +15,14 @@ const changeBackgroundVideo = setInterval(() => {
   const videoMaxIndex = videoBg?.dataset.maxindex;
 
   if (videoMaxIndex) {
-    if (videoBgArrayIndex.length === 0)
+    if (videoBgArrayIndex.length === 0) {
       videoBgArrayIndex = Array.from(Array(parseInt(videoMaxIndex)).keys());
-    videoBgArrayIndex.sort(() => 0.5 - Math.random());
+      videoBgArrayIndex.sort(() => 0.5 - Math.random());
+    }
     videoBg.src = videoSource + String(videoBgArrayIndex.pop()) + ".mp4";
+    
     console.log("changeBackgroundVideo", videoBg.src);
+    console.log(videoBgArrayIndex);
   }
 }, 6000);
 
@@ -67,15 +70,14 @@ async function search(q = null) {
   if (q) {
     clearLocalStorage();
     _q = q;
-  } 
-  else {
+  } else {
     _q = getLocalStorageItem("q");
   }
   const maxTokenCall = getLocalStorageItem("max_token_call");
   let _maxTokenCallInt = maxTokenCall ? parseInt(maxTokenCall) : -1;
 
-  if (_q && (ytMaxCalls >= _maxTokenCallInt)) {
-    console.log('inside');
+  if (_q && ytMaxCalls >= _maxTokenCallInt) {
+    console.log("inside");
     yt_params.q = _q;
     delete yt_params.pageToken;
     const _nextPageToken = getLocalStorageItem("next_page_token");
@@ -184,7 +186,7 @@ function clearApp() {
  */
 window.addEventListener("scroll", infinityScrollHandler, false);
 
-async function infinityScrollHandler(e){
+async function infinityScrollHandler(e) {
   const { clientHeight, scrollHeight, scrollTop } = document.documentElement;
   console.log({ clientHeight, scrollHeight, scrollTop });
   const offset = 2; //px
@@ -196,7 +198,6 @@ async function infinityScrollHandler(e){
     copyright_sym?.classList.remove("searching");
   }
 }
-
 
 /**
  * Local Storage Management
