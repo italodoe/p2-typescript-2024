@@ -46,6 +46,7 @@ footer {
   border: 1px solid white;
   border-radius: 100px;
   width: 30px;
+  height: 30px;
   position: relative;
   display: flex;
   align-content: center;
@@ -53,7 +54,10 @@ footer {
   align-items: center;
 }
 .copyright-sym.searching {
-  border-bottom-color: rgb(30, 177, 67);
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+  /* border-left-color: transparent; */
+  /* border-right-color: transparent; */
   border-width: 2px;
   animation: spin 1s linear infinite;
 }

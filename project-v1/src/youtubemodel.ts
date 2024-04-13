@@ -1,5 +1,14 @@
 import { AppManagement } from "./appmanagement.ts";
 import { LocalStorageManagement } from "./localstoragemanagement.ts";
+import {
+  key_max_token_call,
+  key_next_page_token,
+  key_q,
+  searchUrl,
+  setSearchedClass,
+  thumbnail_class_name,
+  videoEmbedUrl,
+} from "./utils.ts";
 
 /**
  * Youtube model
@@ -71,8 +80,6 @@ export class YoutubeSearchResult implements SearchListResponse {
   }
 
   render(App: AppManagement) {
-    // if (clear) App.clear();
-
     this.items.forEach(function (video, index) {
       const videoId = video.id.videoId;
       const snippet = video.snippet;
@@ -81,21 +88,28 @@ export class YoutubeSearchResult implements SearchListResponse {
       const videoThumbnail = snippet.thumbnails.medium.url; //default|medium|high
 
       const div = document.createElement("div");
-      div.className = "yt-thumbnail-wrapper";
+      div.id = `thumbnail_wrapper_${videoId}`;
+      div.className = thumbnail_class_name.thumbnail_wrapper;
 
       const a = document.createElement("a");
-      a.className = "yt-thumbnail";
-      a.href = YoutubeService._embedUrl + videoId;
+      a.className = thumbnail_class_name.thumbnail;
+      a.id = `thumbnail_${videoId}`;
+      a.href = videoEmbedUrl + videoId;
 
       const img = document.createElement("img");
+      img.id = `thumbnail_img_${videoId}`;
       img.src = videoThumbnail;
+      img.className = thumbnail_class_name.thumbnail_img;
+
       img.title = videoTitle;
 
       const title = document.createElement("h3");
       title.textContent = videoTitle;
 
       const divBg = document.createElement("div");
-      divBg.className = "yt-thumbnail-bg";
+      divBg.id = `thumbnail_bg_${videoId}`;
+      divBg.className = thumbnail_class_name.thumbnail_bg;
+
 
       a.append(img);
       a.append(title);
@@ -117,9 +131,6 @@ interface YouTubeSearchParams {
 }
 
 export class YoutubeService {
-  static videoEmbedUrl: string = "https://www.youtube.com/embed/";
-  static searchUrl: string = "https://www.googleapis.com/youtube/v3/search?";
-
   static maxLoads: number = 5;
   params: YouTubeSearchParams;
   collection: YoutubeSearchResult[] = [];
@@ -128,20 +139,12 @@ export class YoutubeService {
     this.params = params;
   }
 
-  static get _embedUrl(): string {
-    return this.videoEmbedUrl;
-  }
-  static get _searchUrl(): string {
-    return this.searchUrl;
-  }
   static get _maxLoads(): number {
     return this.maxLoads;
   }
 
   async callSearchApi() {
-    const body = await fetch(
-      YoutubeService._searchUrl + new URLSearchParams(this.params)
-    );
+    const body = await fetch(searchUrl + new URLSearchParams(this.params));
     const response = await body.json();
     console.log("response--", response);
     return response;
@@ -152,7 +155,7 @@ export class YoutubeService {
     LocalStorage: LocalStorageManagement,
     q: string | null = null
   ) {
-    const maxTokenCall = LocalStorage.getLocalStorageItem("max_token_call");
+    const maxTokenCall = LocalStorage.getLocalStorageItem(key_max_token_call);
     let _maxTokenCallInt = maxTokenCall ? parseInt(maxTokenCall) : -1;
     let _q: string;
     let canLoad = YoutubeService._maxLoads >= _maxTokenCallInt;
@@ -172,7 +175,7 @@ export class YoutubeService {
       this.params.q = _q;
       delete this.params.pageToken;
       const _nextPageToken =
-        LocalStorage.getLocalStorageItem("next_page_token");
+        LocalStorage.getLocalStorageItem(key_next_page_token);
 
       let clear = true;
       if (_nextPageToken) {
@@ -186,18 +189,17 @@ export class YoutubeService {
       this.collection.push(result);
       result.render(App);
 
-      //todo refactoring to an class
-      const searchClassName = "searched";
-      const bg = document.getElementById("header_back_wrapper");
-      bg?.classList.add(searchClassName);
-      //
-      //todo move string to const
+      // set class for video background
+      setSearchedClass(true);
+
+      //set vars into local storage
       LocalStorage.setLocalStorageItem(
-        "next_page_token",
+        key_next_page_token,
         response.nextPageToken
       );
-      LocalStorage.setLocalStorageItem("q", _q);
-      LocalStorage.setLocalStorageItem("max_token_call", ++_maxTokenCallInt);
+      LocalStorage.setLocalStorageItem(key_q, _q);
+      LocalStorage.setLocalStorageItem(key_max_token_call, ++_maxTokenCallInt);
+
       return true;
     }
 
