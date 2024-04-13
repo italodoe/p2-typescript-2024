@@ -1,5 +1,6 @@
 /**
  * Local Storage Management
+ * DEPRECATED
  */
 
 export class LocalStorageManagement {
@@ -15,13 +16,8 @@ export class LocalStorageManagement {
     return localStorage.getItem(key);
   }
 
-  clearLocalStorage(all = false, key = null) {
-    if (all) localStorage.clear();
-    else {
-      if (key) localStorage.removeItem(key);
-      else {
-        this.localKeyArray.forEach((item) => localStorage.removeItem(item));
-      }
-    }
+  clearLocalStorage(key = null) {
+    if (key) return localStorage.removeItem(key);
+    return this.localKeyArray.forEach((item) => localStorage.removeItem(item));
   }
 }

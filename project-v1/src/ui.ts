@@ -6,16 +6,14 @@ import {
   copyright_sym,
   intervalBgTime,
 } from "./utils.ts";
-import { App, LocalStorage, YoutubeSrv } from "./utils.ts";
+import { App, YoutubeSrv } from "./utils.ts";
 import { YoutubeService } from "./youtubemodel.ts";
-import { LocalStorageManagement } from "./localstoragemanagement.ts";
 
 export class UiManagement {
   searchForm: HTMLFormElement;
   searchInput: HTMLInputElement;
   App: AppManagement;
   YoutubeSrv: YoutubeService;
-  LocalStorage: LocalStorageManagement;
   interval: number;
   videoBgArrayIndex: number[] = [];
   currentTimeOffset: number;
@@ -25,14 +23,13 @@ export class UiManagement {
   constructor() {
     this.App = App;
     this.YoutubeSrv = YoutubeSrv;
-    this.LocalStorage = LocalStorage;
     this.searchForm = search_form;
     this.searchInput = search_input;
     this.scrollOffset = 2;
     this.isIntervalActive = false;
     this.currentTimeOffset = 0;
-    //Interval background
 
+    //Interval background
     this.interval = setInterval(() => {
       this.changeBackgroundVideo();
     }, intervalBgTime);
@@ -54,7 +51,7 @@ export class UiManagement {
     const _q = search_input?.value;
     if (_q) {
       this.App.clear();
-      this.YoutubeSrv.search(this.App, this.LocalStorage, _q);
+      this.YoutubeSrv.search(this.App, _q);
     }
   }
 
@@ -63,11 +60,11 @@ export class UiManagement {
 
     const { clientHeight, scrollHeight, scrollTop } = document.documentElement;
 
-    console.log({ clientHeight, scrollHeight, scrollTop });
+    // console.log({ clientHeight, scrollHeight, scrollTop });
 
     if (scrollTop + clientHeight > scrollHeight - this.scrollOffset) {
       copyright_sym?.classList.add("searching");
-      await YoutubeSrv.search(App, LocalStorage);
+      await YoutubeSrv.search(App);
       copyright_sym?.classList.remove("searching");
     }
   }
@@ -93,7 +90,7 @@ export class UiManagement {
         }
       }
       videoBg.src = videoSource + String(this.videoBgArrayIndex.pop()) + ".mp4";
-      videoBg.currentTime = this.currentTimeOffset;
+      //   videoBg.currentTime = this.currentTimeOffset;
     }
   };
 }
