@@ -92,6 +92,10 @@ main > article > .article-nav {
   border-top: 1px solid var(--border-color);
 }
 
+main > article[data-show="0"]{
+  transform: translateX(-110%);
+}
+
 /* frame */
 .af-wrapper {
   width: 100%;
