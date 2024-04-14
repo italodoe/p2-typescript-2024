@@ -44,17 +44,6 @@ export class PageGenerator {
   }
 
   async pageRender(...args) {
-    // const event = args.pop();
-    // console.log(event.target);
-    console.log("args: ", args);
-    // console.log(e);
-    console.log(this);
-
-    // const Video:  = args[1];
-    console.log("pageRender0", args[0]);
-    console.log("pageRender1", args[1]);
-    console.log("pageRender2", args[2]);
-
     const videoClicked: Item = args[0];
     const collection: [] = args[1].collection;
     var articles = ``;
@@ -68,10 +57,10 @@ export class PageGenerator {
       const currentSlidesLength = index * searchItem.items.length;
 
       searchItem.items.forEach(function (video, index) {
-        console.log("collection->>item", video);
         const _index = currentSlidesLength + index;
         const videoId = video.id.videoId;
         const lyric = ``; //TODO
+        
         const title = video.snippet.title;
         const description = video.snippet.description;
         var dt = new Date(video.snippet.publishTime);
