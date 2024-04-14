@@ -57,12 +57,10 @@ export class UiManagement {
 
   async infinityScrollHandler(e: Event) {
     e.preventDefault();
-
     const { clientHeight, scrollHeight, scrollTop } = document.documentElement;
 
-    // console.log({ clientHeight, scrollHeight, scrollTop });
-
-    if (scrollTop + clientHeight > scrollHeight - this.scrollOffset) {
+    const searcher = document.getElementById("search_input");
+    if (searcher && scrollTop + clientHeight > scrollHeight - this.scrollOffset) {
       copyright_sym?.classList.add("searching");
       await YoutubeSrv.search(App, null);
       copyright_sym?.classList.remove("searching");
