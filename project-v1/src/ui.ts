@@ -64,7 +64,7 @@ export class UiManagement {
 
     if (scrollTop + clientHeight > scrollHeight - this.scrollOffset) {
       copyright_sym?.classList.add("searching");
-      await YoutubeSrv.search(App);
+      await YoutubeSrv.search(App, null);
       copyright_sym?.classList.remove("searching");
     }
   }

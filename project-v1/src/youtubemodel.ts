@@ -3,6 +3,8 @@
  */
 
 import { AppManagement } from "./appmanagement.ts";
+import { PageGenerator } from "./pagegenerator.ts";
+import { UiManagement } from "./ui.ts";
 import {
   searchUrl,
   setSearchedClass,
@@ -39,7 +41,7 @@ interface Snippet {
   liveBroadcastContent: string;
 }
 
-interface Item {
+export interface Item {
   kind: string;
   etag: string;
   id: Id;
@@ -65,6 +67,7 @@ interface SearchListResponse {
   regionCode: string;
   pageInfo: PageInfo;
   items: Item[];
+  PageGenerator: PageGenerator;
 }
 
 interface YouTubeSearchParams {
@@ -95,6 +98,7 @@ export class YoutubeSearchResult implements SearchListResponse {
   regionCode: string;
   pageInfo: PageInfo;
   items: Item[];
+  PageGenerator: PageGenerator;
 
   constructor(response: SearchListResponse) {
     this.kind = response.kind;
@@ -104,11 +108,13 @@ export class YoutubeSearchResult implements SearchListResponse {
     this.regionCode = response.regionCode;
     this.pageInfo = response.pageInfo;
     this.items = response.items;
+    this.PageGenerator = new PageGenerator();
   }
 
   //render
 
   render(App: AppManagement) {
+    let that = this;
     this.items.forEach(function (video, index) {
       const videoId = video.id.videoId;
       const snippet = video.snippet;
@@ -116,20 +122,21 @@ export class YoutubeSearchResult implements SearchListResponse {
       // const videoDescription = snippet.description;
       const videoThumbnail = snippet.thumbnails.medium.url; //default|medium|high
 
-      const div = document.createElement("div");
-      div.id = `thumbnailWrapper_${videoId}`;
-      div.className = thumbnail_class_name.thumbnail_wrapper;
-
       const a = document.createElement("a");
-      a.className = thumbnail_class_name.thumbnail;
-      a.id = `thumbnail_${videoId}`;
-      a.href = videoEmbedUrl + videoId;
+      a.id = `thumbnailWrapper_${videoId}`;
+      a.className = thumbnail_class_name.thumbnail_wrapper;
+      a.href = "#";
+
+      const div = document.createElement("div");
+      div.className = thumbnail_class_name.thumbnail;
+      div.id = `thumbnail_${videoId}`;
+      // a.href = videoEmbedUrl + videoId;
+      div.dataset.id = videoId;
 
       const img = document.createElement("img");
       img.id = `thumbnailImg_${videoId}`;
       img.src = videoThumbnail;
       img.className = thumbnail_class_name.thumbnail_img;
-
       img.title = videoTitle;
 
       const title = document.createElement("h3");
@@ -139,11 +146,13 @@ export class YoutubeSearchResult implements SearchListResponse {
       divBg.id = `thumbnailBg_${videoId}`;
       divBg.className = thumbnail_class_name.thumbnail_bg;
 
-      a.append(img);
-      a.append(title);
-      div.append(a);
-      div.append(divBg);
-      App.append(div);
+      a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
+
+      div.append(img);
+      div.append(title);
+      a.append(div);
+      a.append(divBg);
+      App.append(a);
     });
   }
 }
