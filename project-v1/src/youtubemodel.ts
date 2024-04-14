@@ -67,7 +67,6 @@ interface SearchListResponse {
   regionCode: string;
   pageInfo: PageInfo;
   items: Item[];
-  PageGenerator: PageGenerator;
 }
 
 interface YouTubeSearchParams {
@@ -84,6 +83,8 @@ interface YoutubeServiceParams {
   params: YouTubeSearchParams;
   collection: YoutubeSearchResult[];
   globalValues: YoutubeGlobalValues;
+  PageGenerator: PageGenerator;
+
 }
 
 /**************************************************************************
@@ -98,7 +99,6 @@ export class YoutubeSearchResult implements SearchListResponse {
   regionCode: string;
   pageInfo: PageInfo;
   items: Item[];
-  PageGenerator: PageGenerator;
 
   constructor(response: SearchListResponse) {
     this.kind = response.kind;
@@ -108,7 +108,6 @@ export class YoutubeSearchResult implements SearchListResponse {
     this.regionCode = response.regionCode;
     this.pageInfo = response.pageInfo;
     this.items = response.items;
-    this.PageGenerator = new PageGenerator();
   }
 
   //render
@@ -146,7 +145,11 @@ export class YoutubeSearchResult implements SearchListResponse {
       divBg.id = `thumbnailBg_${videoId}`;
       divBg.className = thumbnail_class_name.thumbnail_bg;
 
-      a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
+      // a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
+      a.addEventListener(
+        "click",
+        that.PageGenerator.pageRender.bind(null, video, that, collection)
+      );
 
       div.append(img);
       div.append(title);
@@ -166,6 +169,8 @@ export class YoutubeService implements YoutubeServiceParams {
   params: YouTubeSearchParams;
   collection: YoutubeSearchResult[];
   globalValues: YoutubeGlobalValues;
+  PageGenerator: PageGenerator;
+
 
   constructor(params: YouTubeSearchParams) {
     this.params = params;
@@ -175,6 +180,8 @@ export class YoutubeService implements YoutubeServiceParams {
       g_next_page_token: null,
       g_q: null,
     };
+    this.PageGenerator = new PageGenerator();
+
   }
 
   //statics
@@ -248,7 +255,9 @@ export class YoutubeService implements YoutubeServiceParams {
       const response = await this.callSearchApi();
       const result = new YoutubeSearchResult(response);
       this.collection.push(result);
-      result.render(App);
+
+      // result.render(App);
+      this.render(App, result);
 
       // set class for video background
       setSearchedClass(true);
@@ -262,5 +271,51 @@ export class YoutubeService implements YoutubeServiceParams {
     }
 
     return false;
+  }
+
+  render(App: AppManagement, result) {
+    const that = this;
+
+    result.items.forEach(function (video: Item[], index: number) {
+      const videoId = video.id.videoId;
+      const snippet = video.snippet;
+      const videoTitle = snippet.title;
+      // const videoDescription = snippet.description;
+      const videoThumbnail = snippet.thumbnails.medium.url; //default|medium|high
+
+      const a = document.createElement("a");
+      a.id = `thumbnailWrapper_${videoId}`;
+      a.className = thumbnail_class_name.thumbnail_wrapper;
+      a.href = "#";
+
+      const div = document.createElement("div");
+      div.className = thumbnail_class_name.thumbnail;
+      div.id = `thumbnail_${videoId}`;
+      // a.href = videoEmbedUrl + videoId;
+      div.dataset.id = videoId;
+
+      const img = document.createElement("img");
+      img.id = `thumbnailImg_${videoId}`;
+      img.src = videoThumbnail;
+      img.className = thumbnail_class_name.thumbnail_img;
+      img.title = videoTitle;
+
+      const title = document.createElement("h3");
+      title.textContent = videoTitle;
+
+      const divBg = document.createElement("div");
+      divBg.id = `thumbnailBg_${videoId}`;
+      divBg.className = thumbnail_class_name.thumbnail_bg;
+
+      // a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
+      a.addEventListener("click", that.PageGenerator.pageRender.bind(null, video, that));
+      // a.addEventListener("click", that.PageGenerator.pageRender.bind(null, video, that, collection));
+
+      div.append(img);
+      div.append(title);
+      a.append(div);
+      a.append(divBg);
+      App.append(a);
+    });
   }
 }

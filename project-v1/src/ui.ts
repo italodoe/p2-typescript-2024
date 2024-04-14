@@ -14,7 +14,7 @@ export class UiManagement {
   searchInput: HTMLInputElement;
   App: AppManagement;
   YoutubeSrv: YoutubeService;
-  interval: number;
+  interval: Timeout ;
   videoBgArrayIndex: number[] = [];
   currentTimeOffset: number;
   scrollOffset: number; //px
@@ -93,4 +93,5 @@ export class UiManagement {
       //   videoBg.currentTime = this.currentTimeOffset;
     }
   };
+
 }
