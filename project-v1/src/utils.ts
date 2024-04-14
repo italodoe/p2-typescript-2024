@@ -1,6 +1,18 @@
 import { AppManagement } from "./appmanagement.ts";
 import { YOUTUBE_key } from "./env.ts";
-import { YoutubeService } from "./youtubemodel.ts";
+import { YoutubeService, YouTubeComments, YouTubeCommentsParams } from "./youtubemodel.ts";
+
+
+//youtube comments
+//YoutubeService : YoutubeSrv
+const default_youtube_comments_param : YouTubeCommentsParams = {
+  key: YOUTUBE_key,
+  videoId: undefined,
+  part: "snippet",
+  maxResults: 10,
+  pageToken: undefined,
+};
+export const YouTubeComment = new YouTubeComments(default_youtube_comments_param);
 
 //YoutubeService : YoutubeSrv
 const default_youtube_param = {
@@ -56,6 +68,10 @@ export function setSearchedClass(active: boolean = true) {
 export const videoEmbedUrl: string = "https://www.youtube.com/embed/";
 export const searchUrl: string =
   "https://www.googleapis.com/youtube/v3/search?";
+export const getCommentsUrl: string =
+  "https://www.googleapis.com/youtube/v3/commentThreads?";
+  // https://www.googleapis.com/youtube/v3/commentThreads?key={your_api_key}&textFormat=plainText&part=snippet&videoId={video_id}&maxResults=100&pageToken={nextPageToken}
+
 
 export const thumbnail_class_name = {
   thumbnail_wrapper: "yt-thumbnail-wrapper",
@@ -63,3 +79,5 @@ export const thumbnail_class_name = {
   thumbnail_img: "yt-thumbnail-img",
   thumbnail_bg: "yt-thumbnail-bg",
 };
+
+

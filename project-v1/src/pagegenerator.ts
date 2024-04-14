@@ -1,3 +1,4 @@
+import { YouTubeComment } from "./utils";
 import { Item, YoutubeService } from "./youtubemodel";
 
 const head = `  
@@ -39,6 +40,7 @@ const nav = `
 
 export class PageGenerator {
   status: boolean;
+
   constructor() {
     this.status = false;
   }
@@ -47,10 +49,7 @@ export class PageGenerator {
     const videoClicked: Item = args[0];
     const collection: [] = args[1].collection;
     var articles = ``;
-    var buttons = [];
     var currentIndex = 0;
-    // const currentSlidesLength = document.querySelectorAll(`.m-article`)?.length;
-
 
     collection.forEach(function (searchItem, index) {
       // continue index
@@ -60,14 +59,14 @@ export class PageGenerator {
         const _index = currentSlidesLength + index;
         const videoId = video.id.videoId;
         const lyric = ``; //TODO
-        
+
         const title = video.snippet.title;
         const description = video.snippet.description;
         var dt = new Date(video.snippet.publishTime);
         const date = dt.toUTCString();
 
         let show = 0;
-        if(videoId === videoClicked.id.videoId ){
+        if (videoId === videoClicked.id.videoId) {
           show = videoId === videoClicked.id.videoId ? 1 : 0;
           currentIndex = _index;
         }
@@ -89,7 +88,7 @@ export class PageGenerator {
               </section>
 
               <section class="article-lyric article-section">
-              <p> ${lyric} </p>
+              <div id="comments_${videoId}"> </div>
               </section>
 
               <section class="article-title article-section">
@@ -123,55 +122,74 @@ export class PageGenerator {
             </main></div>`;
 
     const body = document.getElementById("mainBody");
-    if (body){
-       body.innerHTML = html;
-       const buttons = body.querySelectorAll(`.article-button`);
-       buttons.forEach(function (item, index) {
-        item.addEventListener('click', function(e) {
+
+    if (body) {
+      body.innerHTML = html;
+      const buttons = body.querySelectorAll(`.article-button`);
+
+      buttons.forEach(function (item, index) {
+        item.addEventListener("click", async function (e) {
           e.preventDefault();
 
           const videoId = item.dataset.id;
           const orientation = item.dataset.orientation;
 
-          const main: HTMLElement = document.getElementById(`main_list_player`)
+          const main: HTMLElement = document.getElementById(`main_list_player`);
           const currentIndex = parseInt(main.dataset.index);
-          const iframe: HTMLIFrameElement = document.getElementById(`iframe_${videoId}`)
+          const iframe: HTMLIFrameElement = document.getElementById(
+            `iframe_${videoId}`
+          );
           const slides = document.querySelectorAll(`.m-article`);
 
-          if (iframe){
+          if (iframe) {
             const src = iframe.src;
             const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=0&loop=1&mute=0`;
             iframe.src = embeddedUrl;
           }
-          var nextIndex ,currentSlide, nextSlide
+          var nextIndex, currentSlide, nextSlide;
 
-          if (orientation === "left"){
-            nextIndex = (currentIndex - 1 < 0) ? 0 : (currentIndex - 1);
-            currentSlide = document.querySelector(`.m-article[data-index="${currentIndex}"]`);
-            nextSlide = document.querySelector(`.m-article[data-index="${nextIndex}"]`);
-          }
-          else{ //right
-            nextIndex = currentIndex + 1 === slides.length ? currentIndex : currentIndex + 1;
-            currentSlide = document.querySelector(`.m-article[data-index="${currentIndex}"]`);
-            nextSlide = document.querySelector(`.m-article[data-index="${nextIndex}"]`);
+          if (orientation === "left") {
+            nextIndex = currentIndex - 1 < 0 ? 0 : currentIndex - 1;
+            currentSlide = document.querySelector(
+              `.m-article[data-index="${currentIndex}"]`
+            );
+            nextSlide = document.querySelector(
+              `.m-article[data-index="${nextIndex}"]`
+            );
+          } else {
+            //right
+            nextIndex =
+              currentIndex + 1 === slides.length
+                ? currentIndex
+                : currentIndex + 1;
+            currentSlide = document.querySelector(
+              `.m-article[data-index="${currentIndex}"]`
+            );
+            nextSlide = document.querySelector(
+              `.m-article[data-index="${nextIndex}"]`
+            );
           }
 
-          if (nextSlide){ 
+          if (nextSlide) {
             nextSlide.dataset.show = "1";
             const nextVideoId = nextSlide.dataset.id;
-            const nextIframe: HTMLIFrameElement = document.getElementById(`iframe_${nextVideoId}`)
+            const nextIframe: HTMLIFrameElement = document.getElementById(
+              `iframe_${nextVideoId}`
+            );
             const nextEmbeddedUrl = `https://www.youtube.com/embed/${nextVideoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
             nextIframe.src = nextEmbeddedUrl;
+
+            const commentResponse = await YouTubeComment.callCommentsApi(videoId);
+            YouTubeComment.render(`comments_${nextVideoId}`, commentResponse)
+            console.log(commentResponse);
           }
 
           if (currentSlide) currentSlide.dataset.show = "0";
           main.dataset.index = nextIndex;
 
-    
-        })
+  
+        });
       });
-
     }
-    
   }
 }

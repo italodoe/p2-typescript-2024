@@ -6,6 +6,7 @@ import { AppManagement } from "./appmanagement.ts";
 import { PageGenerator } from "./pagegenerator.ts";
 import { UiManagement } from "./ui.ts";
 import {
+  getCommentsUrl,
   searchUrl,
   setSearchedClass,
   thumbnail_class_name,
@@ -15,7 +16,7 @@ import {
 /**************************************************************************
  *  interface
  *************************************************************************/
-
+//Search element
 interface Thumbnails {
   [key: string]: {
     url: string;
@@ -79,12 +80,22 @@ interface YouTubeSearchParams {
   pageToken?: string | undefined;
 }
 
+interface YouTubeCommentParams {
+  key: string;
+  part: string; //snippet
+  type: string;
+  videoId: string;
+  maxResults: number;
+  pageToken?: string | undefined; //plainText
+}
+
+//Search List
+
 interface YoutubeServiceParams {
   params: YouTubeSearchParams;
   collection: YoutubeSearchResult[];
   globalValues: YoutubeGlobalValues;
   PageGenerator: PageGenerator;
-
 }
 
 /**************************************************************************
@@ -168,20 +179,22 @@ export class YoutubeService implements YoutubeServiceParams {
   static maxLoads: number = 5;
   params: YouTubeSearchParams;
   collection: YoutubeSearchResult[];
+  commentCollection: [];
   globalValues: YoutubeGlobalValues;
   PageGenerator: PageGenerator;
-
+  // YouTubeComments: YouTubeComments; //TODO remove
 
   constructor(params: YouTubeSearchParams) {
     this.params = params;
     this.collection = [];
+    this.commentCollection = [];
     this.globalValues = {
       g_max_token_call: null,
       g_next_page_token: null,
       g_q: null,
     };
     this.PageGenerator = new PageGenerator();
-
+    // this.YouTubeComments = YouTubeComments; //TODO remove
   }
 
   //statics
@@ -221,6 +234,10 @@ export class YoutubeService implements YoutubeServiceParams {
     const response = await body.json();
     console.log("response--", response);
     return response;
+  }
+
+  async callGetCommentsApi(videoId) {
+    this.YouTubeComments.callCommentsApi(videoId);
   }
 
   async search(App: AppManagement, q: string | null = null) {
@@ -276,7 +293,7 @@ export class YoutubeService implements YoutubeServiceParams {
   render(App: AppManagement, result) {
     const that = this;
 
-    result.items.forEach(function (video: Item[], index: number) {
+    result.items.forEach(async function (video: Item[], index: number) {
       const videoId = video.id.videoId;
       const snippet = video.snippet;
       const videoTitle = snippet.title;
@@ -308,7 +325,10 @@ export class YoutubeService implements YoutubeServiceParams {
       divBg.className = thumbnail_class_name.thumbnail_bg;
 
       // a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
-      a.addEventListener("click", that.PageGenerator.pageRender.bind(null, video, that));
+      a.addEventListener(
+        "click",
+        that.PageGenerator.pageRender.bind(null, video, that)
+      );
       // a.addEventListener("click", that.PageGenerator.pageRender.bind(null, video, that, collection));
 
       div.append(img);
@@ -316,6 +336,118 @@ export class YoutubeService implements YoutubeServiceParams {
       a.append(div);
       a.append(divBg);
       App.append(a);
+
     });
   }
+}
+
+/**************************************************************************
+ *  YoutubeComment
+ *************************************************************************/
+
+//Comment list
+export interface YouTubeCommentsParams {
+  key: string | undefined;
+  videoId?: string;
+  part: string;
+  maxResults: number;
+  pageToken?: string;
+}
+
+export class YouTubeComments implements YouTubeCommentsParams {
+  params: YouTubeCommentsParams;
+
+  constructor(params: YouTubeCommentsParams) {
+    this.params = params;
+  }
+
+  async callCommentsApi(videoId) {
+    console.log(videoId);
+    console.log(this.params);
+    this.params.videoId = videoId;
+    delete this.params.pageToken;
+
+    const body = await fetch(getCommentsUrl + new URLSearchParams(this.params));
+    console.log("body", body);
+    const response = await body.json();
+    console.log("response--Comment", response);
+    return response;
+  }
+
+  render(elementId:string, response: CommentThreadListResponse){
+    const items:CommentThread[] = response.items;
+    let html = ``;
+    items.forEach(function (item, index) {  
+        const snippet = item.snippet.topLevelComment.snippet;
+        const author = snippet.authorDisplayName;
+        const textOriginal = snippet.textOriginal;
+        const textDisplay = snippet.textDisplay;
+
+        html += `<div><p>${author}</p><p>${textOriginal}</p></div>`
+        console.log(html);
+    });
+
+    console.log('elementId',elementId)
+    const box = document.getElementById(elementId);
+    console.log('box',box)
+
+    if (box)
+      box.innerHTML = html;
+  }
+}
+
+
+
+//comment object
+interface CommentSnippet {
+  channelId: string;
+  videoId: string;
+  textDisplay: string;
+  textOriginal: string;
+  authorDisplayName: string;
+  authorProfileImageUrl: string;
+  authorChannelUrl: string;
+  authorChannelId: {
+    value: string;
+  };
+  canRate: boolean;
+  viewerRating: string;
+  likeCount: number;
+  publishedAt: string;
+  updatedAt: string;
+}
+
+interface CommentThread {
+  kind: string;
+  etag: string;
+  id: string;
+  snippet: {
+    channelId: string;
+    videoId: string;
+    topLevelComment: CommentSnippet;
+    canReply: boolean;
+    totalReplyCount: number;
+    isPublic: boolean;
+  };
+}
+
+interface CommentThreadListResponse {
+  kind: string;
+  etag: string;
+  nextPageToken: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  items: CommentThread[];
+}
+
+class Comment {
+  constructor(
+    public kind: string,
+    public etag: string,
+    public nextPageToken: string,
+    public pageInfo: { totalResults: number; resultsPerPage: number },
+    public items: CommentThread[]
+  ) {}
 }
