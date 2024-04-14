@@ -50,6 +50,7 @@ export class PageGenerator {
     const collection: [] = args[1].collection;
     var articles = ``;
     var currentIndex = 0;
+    var currentVideoId = 0;
 
     collection.forEach(function (searchItem, index) {
       // continue index
@@ -69,6 +70,7 @@ export class PageGenerator {
         if (videoId === videoClicked.id.videoId) {
           show = videoId === videoClicked.id.videoId ? 1 : 0;
           currentIndex = _index;
+          currentVideoId = videoId;
         }
         const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=${show}&loop=1&mute=0`;
 
@@ -125,8 +127,12 @@ export class PageGenerator {
 
     if (body) {
       body.innerHTML = html;
-      const buttons = body.querySelectorAll(`.article-button`);
+      const commentResponse = await YouTubeComment.callCommentsApi(
+        currentVideoId
+      );
+      YouTubeComment.render(`comments_${currentVideoId}`, commentResponse);
 
+      const buttons = body.querySelectorAll(`.article-button`);
       buttons.forEach(function (item, index) {
         item.addEventListener("click", async function (e) {
           e.preventDefault();
@@ -179,15 +185,15 @@ export class PageGenerator {
             const nextEmbeddedUrl = `https://www.youtube.com/embed/${nextVideoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
             nextIframe.src = nextEmbeddedUrl;
 
-            const commentResponse = await YouTubeComment.callCommentsApi(videoId);
-            YouTubeComment.render(`comments_${nextVideoId}`, commentResponse)
-            console.log(commentResponse);
+            const commentResponse = await YouTubeComment.callCommentsApi(
+              videoId
+            );
+            YouTubeComment.render(`comments_${nextVideoId}`, commentResponse);
+
           }
 
           if (currentSlide) currentSlide.dataset.show = "0";
           main.dataset.index = nextIndex;
-
-  
         });
       });
     }

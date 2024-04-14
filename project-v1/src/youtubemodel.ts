@@ -336,7 +336,6 @@ export class YoutubeService implements YoutubeServiceParams {
       a.append(div);
       a.append(divBg);
       App.append(a);
-
     });
   }
 }
@@ -374,29 +373,26 @@ export class YouTubeComments implements YouTubeCommentsParams {
     return response;
   }
 
-  render(elementId:string, response: CommentThreadListResponse){
-    const items:CommentThread[] = response.items;
+  render(elementId: string, response: CommentThreadListResponse) {
+    const items: CommentThread[] = response.items;
     let html = ``;
-    items.forEach(function (item, index) {  
-        const snippet = item.snippet.topLevelComment.snippet;
-        const author = snippet.authorDisplayName;
-        const textOriginal = snippet.textOriginal;
-        const textDisplay = snippet.textDisplay;
+    items.forEach(function (item, index) {
+      const snippet = item.snippet.topLevelComment.snippet;
+      const author = snippet.authorDisplayName;
+      const textOriginal = snippet.textOriginal;
+      const textDisplay = snippet.textDisplay;
 
-        html += `<div><p>${author}</p><p>${textOriginal}</p></div>`
-        console.log(html);
+      html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
+      console.log(html);
     });
 
-    console.log('elementId',elementId)
+    console.log("elementId", elementId);
     const box = document.getElementById(elementId);
-    console.log('box',box)
+    console.log("box", box);
 
-    if (box)
-      box.innerHTML = html;
+    if (box) box.innerHTML = html;
   }
 }
-
-
 
 //comment object
 interface CommentSnippet {
