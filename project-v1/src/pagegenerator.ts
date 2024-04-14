@@ -20,7 +20,7 @@ const head = `
 const nav = `    
 <nav>
 <section id="nav_logo" class="nav-section">
-  <a href="#"><i class="fa-brands fa-youtube"></i></a>
+  <a href="/"><i class="fa-brands fa-youtube"></i></a>
 </section>
 <section id="nav_link" class="nav-section">
   <a href="#"><i class="fa-solid fa-ghost"></i></a>
