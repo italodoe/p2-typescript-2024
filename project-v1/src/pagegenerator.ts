@@ -155,7 +155,8 @@ export class PageGenerator {
           var nextIndex, currentSlide, nextSlide;
 
           if (orientation === "left") {
-            nextIndex = currentIndex - 1 < 0 ? 0 : currentIndex - 1;
+            nextIndex =
+              currentIndex - 1 < 0 ? slides.length - 1 : currentIndex - 1;
             currentSlide = document.querySelector(
               `.m-article[data-index="${currentIndex}"]`
             );
@@ -166,7 +167,7 @@ export class PageGenerator {
             //right
             nextIndex =
               currentIndex + 1 === slides.length
-                ? currentIndex
+                ? 0
                 : currentIndex + 1;
             currentSlide = document.querySelector(
               `.m-article[data-index="${currentIndex}"]`
@@ -189,7 +190,6 @@ export class PageGenerator {
               videoId
             );
             YouTubeComment.render(`comments_${nextVideoId}`, commentResponse);
-
           }
 
           if (currentSlide) currentSlide.dataset.show = "0";

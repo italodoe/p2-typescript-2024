@@ -368,28 +368,36 @@ export class YouTubeComments implements YouTubeCommentsParams {
 
     const body = await fetch(getCommentsUrl + new URLSearchParams(this.params));
     console.log("body", body);
+    console.log('status', body.status)
+
+
+    if (body.status === 200){
     const response = await body.json();
     console.log("response--Comment", response);
+
     return response;
+  }
+    return null;
   }
 
   render(elementId: string, response: CommentThreadListResponse) {
-    const items: CommentThread[] = response.items;
-    let html = ``;
-    items.forEach(function (item, index) {
-      const snippet = item.snippet.topLevelComment.snippet;
-      const author = snippet.authorDisplayName;
-      const textOriginal = snippet.textOriginal;
-      const textDisplay = snippet.textDisplay;
+    console.log('render-response',response);
+    let html = `<p>No Comments allowed for this video</p>`;
+    if (response) {
+      const items: CommentThread[] = response.items;
+      html = ``;
+      items.forEach(function (item, index) {
+        const snippet = item.snippet.topLevelComment.snippet;
+        const author = snippet.authorDisplayName;
+        const textOriginal = snippet.textOriginal;
+        const textDisplay = snippet.textDisplay;
 
-      html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
-      console.log(html);
-    });
-
-    console.log("elementId", elementId);
+        html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
+        console.log(html);
+      });
+    }
+    console.log('elementId',elementId);
     const box = document.getElementById(elementId);
-    console.log("box", box);
-
     if (box) box.innerHTML = html;
   }
 }
