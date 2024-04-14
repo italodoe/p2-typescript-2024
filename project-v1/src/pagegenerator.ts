@@ -74,6 +74,9 @@ export class PageGenerator {
         const lyric = ``; //TODO
         const title = video.snippet.title;
         const description = video.snippet.description;
+        var dt = new Date(video.snippet.publishTime);
+        const date = dt.toUTCString();
+
         let show = 0;
         if(videoId === videoClicked.id.videoId ){
           show = videoId === videoClicked.id.videoId ? 1 : 0;
@@ -105,6 +108,7 @@ export class PageGenerator {
                   <h2>  ${title} </h2>
               </div>
               <div class="at-wrapper-description">
+                  <p>${date} </p>
                   <p> ${description} </p>
               </div>
               </section>

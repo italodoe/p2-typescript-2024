@@ -111,6 +111,7 @@
   
   main.list-player > article > .article-frame {
     background-color: #000000;
+    min-height: 50vh;
   }
   main.list-player > article > .article-frame > .af-wrapper {
     background-position: center;
@@ -158,6 +159,9 @@
   main.list-player > article > .article-title > .at-wrapper-description {
     flex-basis: 70%;
     padding: 1.5rem;
+    overflow: auto;
+    height: 50%;
+    min-height: 5rem;
   }
   
   /* lyric */
