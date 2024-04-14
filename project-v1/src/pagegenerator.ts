@@ -79,7 +79,7 @@ export class PageGenerator {
 
         // const thumbnail = video.snippet.thumbnails.medium;
         articles += `
-          <article class="m-article" data-index="${index}" data-show="${show}">
+          <article class="m-article" data-index="${index}" data-show="${show}" data-id="${videoId}">
               <section class="article-frame article-section">
               <div class="video-background">
                   <iframe
@@ -147,7 +147,6 @@ export class PageGenerator {
             const src = iframe.src;
             const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=0&loop=1&mute=0`;
             iframe.src = embeddedUrl;
-            console.log(iframe)
           }
           var nextIndex ,currentSlide, nextSlide
 
@@ -158,13 +157,19 @@ export class PageGenerator {
             nextSlide = document.querySelector(`.m-article[data-index="${nextIndex}"]`);
           }
           else{ //right
-            console.log('right',slides);
             nextIndex = currentIndex + 1 === slides.length ? currentIndex : currentIndex + 1;
             currentSlide = document.querySelector(`.m-article[data-index="${currentIndex}"]`);
             nextSlide = document.querySelector(`.m-article[data-index="${nextIndex}"]`);
           }
 
-          if (nextSlide) nextSlide.dataset.show = "1";
+          if (nextSlide){ 
+            nextSlide.dataset.show = "1";
+            const nextVideoId = nextSlide.dataset.id;
+            const nextIframe: HTMLIFrameElement = document.getElementById(`iframe_${nextVideoId}`)
+            const nextEmbeddedUrl = `https://www.youtube.com/embed/${nextVideoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
+            nextIframe.src = nextEmbeddedUrl;
+          }
+
           if (currentSlide) currentSlide.dataset.show = "0";
           main.dataset.index = nextIndex;
 
