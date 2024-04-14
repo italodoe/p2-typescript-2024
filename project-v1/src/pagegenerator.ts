@@ -60,12 +60,16 @@ export class PageGenerator {
     var articles = ``;
     var buttons = [];
     var currentIndex = 0;
+    // const currentSlidesLength = document.querySelectorAll(`.m-article`)?.length;
+
 
     collection.forEach(function (searchItem, index) {
-      console.log("collection->>item", searchItem);
+      // continue index
+      const currentSlidesLength = index * searchItem.items.length;
 
       searchItem.items.forEach(function (video, index) {
         console.log("collection->>item", video);
+        const _index = currentSlidesLength + index;
         const videoId = video.id.videoId;
         const lyric = ``; //TODO
         const title = video.snippet.title;
@@ -73,13 +77,13 @@ export class PageGenerator {
         let show = 0;
         if(videoId === videoClicked.id.videoId ){
           show = videoId === videoClicked.id.videoId ? 1 : 0;
-          currentIndex = index;
+          currentIndex = _index;
         }
         const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=${show}&loop=1&mute=0`;
 
         // const thumbnail = video.snippet.thumbnails.medium;
-        articles += `
-          <article class="m-article" data-index="${index}" data-show="${show}" data-id="${videoId}">
+        articles += ` 
+          <article class="m-article" data-index="${_index}" data-show="${show}" data-id="${videoId}">
               <section class="article-frame article-section">
               <div class="video-background">
                   <iframe
@@ -125,7 +129,6 @@ export class PageGenerator {
                 ${articles}
             </main></div>`;
 
-    console.log(html);
     const body = document.getElementById("mainBody");
     if (body){
        body.innerHTML = html;
@@ -133,7 +136,6 @@ export class PageGenerator {
        buttons.forEach(function (item, index) {
         item.addEventListener('click', function(e) {
           e.preventDefault();
-          console.log(e);
 
           const videoId = item.dataset.id;
           const orientation = item.dataset.orientation;
@@ -151,7 +153,6 @@ export class PageGenerator {
           var nextIndex ,currentSlide, nextSlide
 
           if (orientation === "left"){
-            console.log('left');
             nextIndex = (currentIndex - 1 < 0) ? 0 : (currentIndex - 1);
             currentSlide = document.querySelector(`.m-article[data-index="${currentIndex}"]`);
             nextSlide = document.querySelector(`.m-article[data-index="${nextIndex}"]`);
