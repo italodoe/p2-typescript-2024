@@ -1,2 +1,0 @@
-import "./style-list.css";
- 

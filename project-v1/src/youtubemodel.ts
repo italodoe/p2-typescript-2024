@@ -6,6 +6,7 @@ import { AppManagement } from "./appmanagement.ts";
 import { PageGenerator } from "./pagegenerator.ts";
 import { UiManagement } from "./ui.ts";
 import {
+  YouTubeComment,
   getCommentsUrl,
   searchUrl,
   setSearchedClass,
@@ -120,55 +121,6 @@ export class YoutubeSearchResult implements SearchListResponse {
     this.pageInfo = response.pageInfo;
     this.items = response.items;
   }
-
-  //render
-
-  render(App: AppManagement) {
-    let that = this;
-    this.items.forEach(function (video, index) {
-      const videoId = video.id.videoId;
-      const snippet = video.snippet;
-      const videoTitle = snippet.title;
-      // const videoDescription = snippet.description;
-      const videoThumbnail = snippet.thumbnails.medium.url; //default|medium|high
-
-      const a = document.createElement("a");
-      a.id = `thumbnailWrapper_${videoId}`;
-      a.className = thumbnail_class_name.thumbnail_wrapper;
-      a.href = "#";
-
-      const div = document.createElement("div");
-      div.className = thumbnail_class_name.thumbnail;
-      div.id = `thumbnail_${videoId}`;
-      // a.href = videoEmbedUrl + videoId;
-      div.dataset.id = videoId;
-
-      const img = document.createElement("img");
-      img.id = `thumbnailImg_${videoId}`;
-      img.src = videoThumbnail;
-      img.className = thumbnail_class_name.thumbnail_img;
-      img.title = videoTitle;
-
-      const title = document.createElement("h3");
-      title.textContent = videoTitle;
-
-      const divBg = document.createElement("div");
-      divBg.id = `thumbnailBg_${videoId}`;
-      divBg.className = thumbnail_class_name.thumbnail_bg;
-
-      // a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
-      a.addEventListener(
-        "click",
-        that.PageGenerator.pageRender.bind(null, video, that, collection)
-      );
-
-      div.append(img);
-      div.append(title);
-      a.append(div);
-      a.append(divBg);
-      App.append(a);
-    });
-  }
 }
 
 /**************************************************************************
@@ -182,7 +134,6 @@ export class YoutubeService implements YoutubeServiceParams {
   commentCollection: [];
   globalValues: YoutubeGlobalValues;
   PageGenerator: PageGenerator;
-  // YouTubeComments: YouTubeComments; //TODO remove
 
   constructor(params: YouTubeSearchParams) {
     this.params = params;
@@ -194,7 +145,6 @@ export class YoutubeService implements YoutubeServiceParams {
       g_q: null,
     };
     this.PageGenerator = new PageGenerator();
-    // this.YouTubeComments = YouTubeComments; //TODO remove
   }
 
   //statics
@@ -232,12 +182,11 @@ export class YoutubeService implements YoutubeServiceParams {
   async callSearchApi() {
     const body = await fetch(searchUrl + new URLSearchParams(this.params));
     const response = await body.json();
-    console.log("response--", response);
     return response;
   }
 
-  async callGetCommentsApi(videoId) {
-    this.YouTubeComments.callCommentsApi(videoId);
+  async callGetCommentsApi(videoId: string) {
+    YouTubeComment.callCommentsApi(videoId);
   }
 
   async search(App: AppManagement, q: string | null = null) {
@@ -290,7 +239,7 @@ export class YoutubeService implements YoutubeServiceParams {
     return false;
   }
 
-  render(App: AppManagement, result) {
+  render(App: AppManagement, result: YoutubeSearchResult) {
     const that = this;
 
     result.items.forEach(async function (video: Item[], index: number) {
@@ -324,12 +273,10 @@ export class YoutubeService implements YoutubeServiceParams {
       divBg.id = `thumbnailBg_${videoId}`;
       divBg.className = thumbnail_class_name.thumbnail_bg;
 
-      // a.addEventListener("click", that.PageGenerator.pageRender.bind(video));
       a.addEventListener(
         "click",
         that.PageGenerator.pageRender.bind(null, video, that)
       );
-      // a.addEventListener("click", that.PageGenerator.pageRender.bind(null, video, that, collection));
 
       div.append(img);
       div.append(title);
@@ -353,50 +300,40 @@ export interface YouTubeCommentsParams {
   pageToken?: string;
 }
 
-export class YouTubeComments implements YouTubeCommentsParams {
+export class YouTubeComments {
   params: YouTubeCommentsParams;
 
   constructor(params: YouTubeCommentsParams) {
     this.params = params;
   }
 
-  async callCommentsApi(videoId) {
-    console.log(videoId);
-    console.log(this.params);
+  async callCommentsApi(videoId: string) {
     this.params.videoId = videoId;
     delete this.params.pageToken;
 
     const body = await fetch(getCommentsUrl + new URLSearchParams(this.params));
-    console.log("body", body);
-    console.log('status', body.status)
 
-
-    if (body.status === 200){
-    const response = await body.json();
-    console.log("response--Comment", response);
-
-    return response;
-  }
+    if (body.status === 200) {
+      const response = await body.json();
+      return response;
+    }
     return null;
   }
 
   render(elementId: string, response: CommentThreadListResponse) {
-    console.log('render-response',response);
     let html = `<p>No Comments allowed for this video</p>`;
     if (response) {
       const items: CommentThread[] = response.items;
       html = ``;
-      items.forEach(function (item, index) {
+      items.forEach(function (item: any, index: number) {
         const snippet = item.snippet.topLevelComment.snippet;
         const author = snippet.authorDisplayName;
         const textOriginal = snippet.textOriginal;
         const textDisplay = snippet.textDisplay;
 
         html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
-        console.log(html);
       });
     }
-    console.log('elementId',elementId);
     const box = document.getElementById(elementId);
     if (box) box.innerHTML = html;
   }

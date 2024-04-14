@@ -14,7 +14,7 @@ export class UiManagement {
   searchInput: HTMLInputElement;
   App: AppManagement;
   YoutubeSrv: YoutubeService;
-  interval: Timeout ;
+  interval: null | ReturnType<typeof setTimeout>;
   videoBgArrayIndex: number[] = [];
   currentTimeOffset: number;
   scrollOffset: number; //px
@@ -60,7 +60,10 @@ export class UiManagement {
     const { clientHeight, scrollHeight, scrollTop } = document.documentElement;
 
     const searcher = document.getElementById("search_input");
-    if (searcher && scrollTop + clientHeight > scrollHeight - this.scrollOffset) {
+    if (
+      searcher &&
+      scrollTop + clientHeight > scrollHeight - this.scrollOffset
+    ) {
       copyright_sym?.classList.add("searching");
       await YoutubeSrv.search(App, null);
       copyright_sym?.classList.remove("searching");
@@ -88,8 +91,6 @@ export class UiManagement {
         }
       }
       videoBg.src = videoSource + String(this.videoBgArrayIndex.pop()) + ".mp4";
-      //   videoBg.currentTime = this.currentTimeOffset;
     }
   };
-
 }

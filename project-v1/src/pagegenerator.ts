@@ -45,18 +45,19 @@ export class PageGenerator {
     this.status = false;
   }
 
-  async pageRender(...args) {
+  async pageRender(...args: any) {
     const videoClicked: Item = args[0];
     const collection: [] = args[1].collection;
     var articles = ``;
     var currentIndex = 0;
     var currentVideoId = 0;
 
-    collection.forEach(function (searchItem, index) {
+    collection.forEach(function (searchItem: any, indexOne: number) {
       // continue index
-      const currentSlidesLength = index * searchItem.items.length;
+      const items: [] = searchItem.items;
+      const currentSlidesLength = indexOne * items.length;
 
-      searchItem.items.forEach(function (video, index) {
+      items.forEach(function (video: any, index: number) {
         const _index = currentSlidesLength + index;
         const videoId = video.id.videoId;
         const lyric = ``; //TODO
@@ -73,8 +74,8 @@ export class PageGenerator {
           currentVideoId = videoId;
         }
         const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=${show}&loop=1&mute=0`;
-
         // const thumbnail = video.snippet.thumbnails.medium;
+
         articles += ` 
           <article class="m-article" data-index="${_index}" data-show="${show}" data-id="${videoId}">
               <section class="article-frame article-section">
@@ -133,19 +134,19 @@ export class PageGenerator {
       YouTubeComment.render(`comments_${currentVideoId}`, commentResponse);
 
       const buttons = body.querySelectorAll(`.article-button`);
-      buttons.forEach(function (item, index) {
-        item.addEventListener("click", async function (e) {
+      buttons.forEach(function (item: any, index: number) {
+        item.addEventListener("click", async function (e: Event) {
           e.preventDefault();
 
           const videoId = item.dataset.id;
           const orientation = item.dataset.orientation;
-
-          const main: HTMLElement = document.getElementById(`main_list_player`);
-          const currentIndex = parseInt(main.dataset.index);
-          const iframe: HTMLIFrameElement = document.getElementById(
+          const iframe: HTMLIFrameElement | null = document.getElementById(
             `iframe_${videoId}`
           );
           const slides = document.querySelectorAll(`.m-article`);
+
+          const main: HTMLElement | null =
+            document.getElementById(`main_list_player`);
 
           if (iframe) {
             const src = iframe.src;
@@ -154,46 +155,49 @@ export class PageGenerator {
           }
           var nextIndex, currentSlide, nextSlide;
 
-          if (orientation === "left") {
-            nextIndex =
-              currentIndex - 1 < 0 ? slides.length - 1 : currentIndex - 1;
-            currentSlide = document.querySelector(
-              `.m-article[data-index="${currentIndex}"]`
-            );
-            nextSlide = document.querySelector(
-              `.m-article[data-index="${nextIndex}"]`
-            );
-          } else {
-            //right
-            nextIndex =
-              currentIndex + 1 === slides.length
-                ? 0
-                : currentIndex + 1;
-            currentSlide = document.querySelector(
-              `.m-article[data-index="${currentIndex}"]`
-            );
-            nextSlide = document.querySelector(
-              `.m-article[data-index="${nextIndex}"]`
-            );
+          if (main) {
+            const currentIndex = parseInt(main.dataset.index);
+
+            if (orientation === "left") {
+              nextIndex =
+                currentIndex - 1 < 0 ? slides.length - 1 : currentIndex - 1;
+              currentSlide = document.querySelector(
+                `.m-article[data-index="${currentIndex}"]`
+              );
+              nextSlide = document.querySelector(
+                `.m-article[data-index="${nextIndex}"]`
+              );
+            } else {
+              //right
+              nextIndex =
+                currentIndex + 1 === slides.length ? 0 : currentIndex + 1;
+              currentSlide = document.querySelector(
+                `.m-article[data-index="${currentIndex}"]`
+              );
+              nextSlide = document.querySelector(
+                `.m-article[data-index="${nextIndex}"]`
+              );
+            }
+
+            if (nextSlide) {
+              nextSlide.dataset.show = "1";
+              const nextVideoId = nextSlide.dataset.id;
+              const nextIframe: HTMLIFrameElement = document.getElementById(
+                `iframe_${nextVideoId}`
+              );
+              const nextEmbeddedUrl = `https://www.youtube.com/embed/${nextVideoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
+              nextIframe.src = nextEmbeddedUrl;
+
+              const commentResponse = await YouTubeComment.callCommentsApi(
+                videoId
+              );
+              YouTubeComment.render(`comments_${nextVideoId}`, commentResponse);
+            }
+
+            if (currentSlide) 
+              currentSlide.dataset.show = "0";
+            main.dataset.index = nextIndex;
           }
-
-          if (nextSlide) {
-            nextSlide.dataset.show = "1";
-            const nextVideoId = nextSlide.dataset.id;
-            const nextIframe: HTMLIFrameElement = document.getElementById(
-              `iframe_${nextVideoId}`
-            );
-            const nextEmbeddedUrl = `https://www.youtube.com/embed/${nextVideoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
-            nextIframe.src = nextEmbeddedUrl;
-
-            const commentResponse = await YouTubeComment.callCommentsApi(
-              videoId
-            );
-            YouTubeComment.render(`comments_${nextVideoId}`, commentResponse);
-          }
-
-          if (currentSlide) currentSlide.dataset.show = "0";
-          main.dataset.index = nextIndex;
         });
       });
     }
