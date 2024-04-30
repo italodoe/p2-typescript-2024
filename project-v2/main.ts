@@ -1,5 +1,5 @@
 import { forceExit } from "./helpers";
-import { getYoutubeVideosList } from "./youtubemodel";
+import { YoutubeManager } from "./youtubemodel";
 
 if (process.argv.length != 4) {
   forceExit(1);
@@ -15,17 +15,12 @@ switch (option) {
     break;
   }
 
-
   case "-y":
   case "--youtube": {
     //call load
-    const search  = await getYoutubeVideosList(q)
 
-
-    //exit with message
-
-
-
+    const Manager = new YoutubeManager(q);
+    const index = await Manager.generateIndex();
 
     forceExit(0, false);
     break;
@@ -36,6 +31,5 @@ switch (option) {
     break;
   }
 }
-
 
 //YOutube
