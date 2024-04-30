@@ -125,9 +125,9 @@ export class YoutubeSearchResult implements SearchListResponse {
 
       //create item page: html, file
       const nextIndex = index + 1 >= array.length ? 0 : index + 1;
-      const previousIndex = index + -1 < 0 ? 0 : index - 1;
+      const previousIndex = index===0 ? array.length -1 : index - 1;
       const nextVideoId = array[nextIndex].id.videoId;
-      const preVideoId = array[nextIndex].id.videoId;
+      const preVideoId = array[previousIndex].id.videoId;
       const mainItem = createMainItem(
         videoId,
         String(index),
