@@ -3,8 +3,12 @@ import { writeFile } from "fs/promises";
 
 import {
   bodyHtml,
+  bodyItem,
+  createMainItem,
   createThumbnail,
   headHtml,
+  itemFolder,
+  manageFolder,
   maxN,
   searchUrl,
   type Item,
@@ -21,9 +25,8 @@ export class YoutubeManager {
 
   async generateIndex() {
     const result = await this.getYoutubeSearchResult();
-    const indexHtml = result.render(this.query);
-    const filename = "index.html";
-    await writeFile(filename, indexHtml);
+    const indexHtml = await result.render(this.query);
+    await writeFile("index.html", indexHtml);
     return indexHtml;
   }
 
@@ -70,8 +73,8 @@ export class YoutubeSearchResult implements SearchListResponse {
     this.query = query;
   }
 
-  render(query: string) {
-    const list = this.getListRender();
+  async render(query: string) {
+    const list = await this.getListRender();
     const body = bodyHtml(query, list);
     return `
     <!DOCTYPE html>
@@ -89,17 +92,55 @@ export class YoutubeSearchResult implements SearchListResponse {
     `;
   }
 
-  getListRender() {
+  renderItemPage(videoId: string, mainItem: string) {
+    const body = bodyItem(mainItem, "2");
+
+    return `
+    <!DOCTYPE html>
+    <html lang="en" id="html">
+        ${headHtml}
+        <body id="mainBody">
+            ${body}
+        </body>
+    </html>
+    `;
+  }
+
+  async getListRender() {
     const that = this;
     var html = ``;
+    await manageFolder(itemFolder);
 
-    this.items.forEach(function (video: Item[], index: number) {
+    this.items.forEach(async function (video: Item[], index: number, array) {
       const videoId = video.id.videoId;
       const snippet = video.snippet;
       const videoTitle = snippet.title;
       // const videoDescription = snippet.description;
       const videoThumbnail = snippet.thumbnails.medium.url; //default|medium|high
+      const videoDescription = video.snippet.description;
+      var dt = new Date(video.snippet.publishTime);
+      const videoDate = dt.toUTCString();
+      //generate index page html
       html += createThumbnail(videoId, videoTitle, videoThumbnail);
+
+      //create item page: html, file
+      const nextIndex = index + 1 >= array.length ? 0 : index + 1;
+      const previousIndex = index + -1 < 0 ? 0 : index - 1;
+      const nextVideoId = array[nextIndex].id.videoId;
+      const preVideoId = array[nextIndex].id.videoId;
+      const mainItem = createMainItem(
+        videoId,
+        String(index),
+        "1",
+        videoTitle,
+        videoDate,
+        videoDescription,
+        nextVideoId,
+        preVideoId
+      );
+      const itemRender = that.renderItemPage(videoId, mainItem);
+      const filename = itemFolder + `item-page-${videoId}.html`;
+      await writeFile(filename, itemRender);
     });
 
     return html;

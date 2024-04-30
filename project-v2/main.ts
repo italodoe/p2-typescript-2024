@@ -22,7 +22,7 @@ switch (option) {
     const Manager = new YoutubeManager(q);
     const index = await Manager.generateIndex();
 
-    forceExit(0, false);
+    // forceExit(0, false);
     break;
   }
 

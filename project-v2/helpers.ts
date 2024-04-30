@@ -1,3 +1,6 @@
+import fs from "fs";
+const path = require("path");
+
 export const usageText = `Usage: bun run main.ts [options]
 
 Options:
@@ -14,7 +17,6 @@ export function forceExit(code: number, withError: boolean = true) {
   if (withError) console.error(usageText);
   process.exit(code);
 }
-
 
 //interfaces
 
@@ -71,9 +73,10 @@ export interface SearchListResponse {
 export const headHtml = `
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/ico" href="./favicon.ico" />
+    <link rel="icon" type="image/ico" href="../favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="../styles/style-list.css">
 
     <link
       rel="stylesheet"
@@ -140,7 +143,7 @@ export const createThumbnail = (
     <a
     id="thumbnailWrapper_${videoId}"
     class="yt-thumbnail-wrapper"
-    href="#"
+    href="./items/item-page-${videoId}.html"
     ><div
         class="yt-thumbnail"
         id="thumbnail_${videoId}"
@@ -158,3 +161,113 @@ export const createThumbnail = (
     ></a>
     `;
 };
+
+const navItem = `    
+<nav>
+<section id="nav_logo" class="nav-section">
+  <a href="../index.html"><i class="fa-brands fa-youtube"></i></a>
+</section>
+<section id="nav_link" class="nav-section">
+  <a href="#"><i class="fa-solid fa-ghost"></i></a>
+  <a href="#"><i class="fa-solid fa-dice-d20"></i></a>
+</section>
+<section id="nav_other1" class="nav-section">
+  <a href="#"><i class="fa-solid fa-microchip"></i></a>
+  <a href="#"><i class="fa-solid fa-microchip"></i></a>
+  <a href="#"><i class="fa-solid fa-microchip"></i></a>
+</section>
+<section id="nav_other2" class="nav-section">
+  <a href="#"><i class="fa-solid fa-circle-nodes"></i></a>
+</section>
+</nav>
+`;
+
+export const createMainItem = (
+  videoId: string,
+  index: string,
+  show: string,
+  title: string,
+  date: string,
+  description: string,
+  nextVideoId: string,
+  preVideoId: string
+) => {
+  const embeddedUrl = `https://www.youtube.com/embed/${videoId}?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=0`;
+
+  return `
+    <article class="m-article" data-index="${index}" data-show="${show}" data-id="${videoId}">
+        <section class="article-frame article-section">
+        <div class="video-background">
+            <iframe
+            id="iframe_${videoId}"
+            class="yt_player_iframe"
+            src="${embeddedUrl}"
+            frameborder="0"
+            allowfullscreen
+            ></iframe>
+        </div>
+        </section>
+
+        <section class="article-lyric article-section">
+        <div id="comments_${videoId}"> </div>
+        </section>
+
+        <section class="article-title article-section">
+        <div class="at-wrapper-title">
+            <h2>  ${title} </h2>
+        </div>
+        <div class="at-wrapper-description">
+            <p>${date} </p>
+            <p> ${description} </p>
+        </div>
+        </section>
+
+        <section class="article-nav article-section">
+        <button class="an-btn-left article-button" data-id="${videoId}" data-orientation="left">
+            <a class="yt-btn-nav" href="./item-page-${preVideoId}.html">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </button>
+        <button class="an-btn-right article-button" data-id="${videoId}" data-orientation="right">
+            <a class="yt-btn-nav" href="./item-page-${nextVideoId}.html">
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </button>
+        </section>
+    </article>
+    
+    `;
+};
+
+export const bodyItem = (mainContent: string, currentIndex: string) => {
+  return `
+    <div class="body-item">
+        ${navItem}
+        <main class="list-player" id="main_list_player" data-index=${currentIndex}>
+            ${mainContent}
+        </main>
+    </div>
+    `;
+};
+
+export const itemFolder = "./items/";
+
+export async function manageFolder(itemFolder: string) {
+  try {
+    if (fs.existsSync(itemFolder)) {
+      const files = fs.readdirSync(itemFolder);
+      files.forEach((file) => {
+        const route = path.join(itemFolder, file);
+        if (fs.lstatSync(route).isDirectory()) {
+          manageFolder(route); // recursively delete subdirectories
+        } else {
+          fs.unlinkSync(route);
+        }
+      });
+    } else {
+      fs.mkdirSync(itemFolder, { recursive: true }); // create folder and any necessary subdirectories
+    }
+  } catch (err) {
+    console.error("Error managing folder:", err);
+  }
+}
