@@ -4,8 +4,9 @@ const path = require("path");
 export const usageText = `Usage: bun run main.ts [options]
 
 Options:
-  -y, --youtube <term>        Search in YouTube for videos related to the specified term
-  -h, --help                  Display this help message`;
+  -y, --youtube <"term">      Search YouTube for videos related to the specified term
+                               Enclose term in single or double quotes.
+  -h, --help                  Display this help message.`;
 
 export const searchUrl: string =
   "https://www.googleapis.com/youtube/v3/search?";
