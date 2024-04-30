@@ -1,0 +1,208 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  --var-background-color: rgb(5, 11, 23);
+  --border-color: rgba(255, 255, 255, 0.1);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a {
+  text-decoration: none;
+}
+
+/* body */
+.body-item {
+  background-color: var(--var-background-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  /* overflow: hidden; */
+}
+
+/* nav */
+nav {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid var(--border-color);
+}
+nav > .nav-section {
+  padding: 3rem 2rem;
+  display: flex;
+  gap: 1rem;
+  border-left: 1px solid var(--border-color);
+  align-items: center;
+  justify-content: center;
+}
+nav i {
+  color: rgba(230, 230, 230, 0.856);
+}
+nav a i {
+  font-size: 2.15rem;
+}
+#nav_logo,
+#nav_link {
+  flex-basis: calc(100% / 3);
+}
+#nav_link {
+  gap: 3rem;
+}
+#nav_other1,
+#nav_other2 {
+  flex-grow: 1;
+}
+
+/* main */
+main.list-player {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+main.list-player > article {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 2fr 1fr;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  transition: transform 400ms ease;
+}
+
+main.list-player > article > .article-section {
+  height: 100%;
+  display: flex;
+  position: relative;
+}
+
+main.list-player > article > .article-lyric,
+main.list-player > article > .article-nav {
+  border-left: 1px solid var(--border-color);
+}
+
+main.list-player > article > .article-nav {
+  border-top: 1px solid var(--border-color);
+}
+
+main.list-player > article[data-show="0"] {
+  transform: translateX(-110%);
+}
+
+/* frame */
+.af-wrapper {
+  width: 100%;
+  height: 100%;
+}
+.af-wrapper > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+main.list-player > article:first-child > .article-frame > .af-wrapper {
+  background-image: url("../public/img/pic-1.jpg");
+}
+
+main.list-player > article > .article-frame {
+  background-color: #000000;
+  min-height: 50vh;
+}
+main.list-player > article > .article-frame > .af-wrapper {
+  background-position: center;
+  background-size: cover;
+}
+
+.video-background {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+.video-background iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+@media (min-aspect-ratio: 1.7777777778) {
+  .video-background iframe {
+    height: 56.25%;
+  }
+}
+@media (max-aspect-ratio: 1.7777777778) {
+  .video-background iframe {
+    width: 177.78%;
+  }
+}
+
+/* title */
+main.list-player > article > .article-title,
+main.list-player > article > .article-title {
+  width: 100%;
+}
+main.list-player > article > .article-title > .at-wrapper-title {
+  flex-basis: 30%;
+  padding: 1.5rem;
+}
+
+/* description */
+main.list-player > article > .article-title > .at-wrapper-description {
+  flex-basis: 70%;
+  padding: 1.5rem;
+  overflow: auto;
+  height: 50%;
+  min-height: 5rem;
+}
+
+/* lyric */
+
+main.list-player > article > .article-lyric {
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  overflow: auto;
+  max-height: calc(100% - 2rem);
+}
+
+/* button */
+main.list-player > article > .article-nav > .article-button {
+  background-color: transparent;
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 3rem;
+  cursor: pointer;
+}
+main.list-player > article > .article-nav > .article-button:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+main.list-player > article > .article-nav > .article-button:nth-child(2) {
+  border-left: 1px solid var(--border-color);
+}
+
+.comment-author {
+  margin: 0;
+  font-weight: 400;
+}
+.comment-text {
+  margin: 5px;
+  font-weight: 200;
+}
+
+.comment-wrapper {
+  margin: 10px 0;
+}
