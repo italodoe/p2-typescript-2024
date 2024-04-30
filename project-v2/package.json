@@ -1,6 +1,6 @@
 {
   "name": "project-v2",
-  "module": "index.ts",
+  "module": "main.ts",
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
