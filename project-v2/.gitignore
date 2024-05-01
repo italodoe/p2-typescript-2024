@@ -176,6 +176,7 @@ dist
 
 notes.md
 .env.ts
+env.ts
 index-test.html
 index.html
 items/
