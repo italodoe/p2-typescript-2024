@@ -6,14 +6,20 @@ import {
   bodyItem,
   createMainItem,
   createThumbnail,
+  getCommentsUrl,
   headHtml,
   itemFolder,
   manageFolder,
   maxN,
   searchUrl,
+  youtubeCommentsParams,
+  youtubeVideosParams,
+  type CommentThread,
+  type CommentThreadListResponse,
   type Item,
   type PageInfo,
   type SearchListResponse,
+  type YouTubeCommentsParams,
 } from "./helpers";
 
 export class YoutubeManager {
@@ -45,8 +51,10 @@ export class YoutubeManager {
       videoEmbeddable: true,
       // pageToken: undefined,
     };
-
-    const body = await fetch(searchUrl + new URLSearchParams(params));
+    youtubeVideosParams.q = this.query;
+    const body = await fetch(
+      searchUrl + new URLSearchParams(youtubeVideosParams)
+    );
     const response = await body.json();
     return response;
   }
@@ -61,6 +69,7 @@ export class YoutubeSearchResult implements SearchListResponse {
   regionCode: string;
   pageInfo: PageInfo;
   items: Item[];
+  YouTubeComments: YouTubeComments;
 
   constructor(response: SearchListResponse, query: string) {
     this.kind = response.kind;
@@ -71,6 +80,7 @@ export class YoutubeSearchResult implements SearchListResponse {
     this.pageInfo = response.pageInfo;
     this.items = response.items;
     this.query = query;
+    this.YouTubeComments = new YouTubeComments(youtubeCommentsParams);
   }
 
   async render(query: string) {
@@ -125,9 +135,10 @@ export class YoutubeSearchResult implements SearchListResponse {
 
       //create item page: html, file
       const nextIndex = index + 1 >= array.length ? 0 : index + 1;
-      const previousIndex = index===0 ? array.length -1 : index - 1;
+      const previousIndex = index === 0 ? array.length - 1 : index - 1;
       const nextVideoId = array[nextIndex].id.videoId;
       const preVideoId = array[previousIndex].id.videoId;
+      const comments = await that.YouTubeComments.createCommentItem(videoId);
       const mainItem = createMainItem(
         videoId,
         String(index),
@@ -135,6 +146,7 @@ export class YoutubeSearchResult implements SearchListResponse {
         videoTitle,
         videoDate,
         videoDescription,
+        comments,
         nextVideoId,
         preVideoId
       );
@@ -142,6 +154,51 @@ export class YoutubeSearchResult implements SearchListResponse {
       const filename = itemFolder + `item-page-${videoId}.html`;
       await writeFile(filename, itemRender);
     });
+
+    return html;
+  }
+}
+
+export class YouTubeComments {
+  params: YouTubeCommentsParams;
+
+  constructor(params: YouTubeCommentsParams) {
+    this.params = params;
+  }
+
+  async createCommentItem(videoId: string) {
+    const commentResponse = await this.callCommentsApi(videoId);
+    return this.render(videoId, commentResponse);
+  }
+
+  async callCommentsApi(videoId: string) {
+    this.params.videoId = videoId;
+    delete this.params.pageToken;
+
+    const body = await fetch(getCommentsUrl + new URLSearchParams(this.params));
+
+    if (body.status === 200) {
+      const response = await body.json();
+      return response;
+    }
+    return null;
+  }
+
+  render(elementId: string, response: CommentThreadListResponse) {
+    let html = `<p>No Comments allowed for this video</p>`;
+    if (response) {
+      const items: CommentThread[] = response.items;
+      html = `<div class="comments">`;
+      items.forEach(function (item: any, index: number) {
+        const snippet = item.snippet.topLevelComment.snippet;
+        const author = snippet.authorDisplayName;
+        const textOriginal = snippet.textOriginal;
+        const textDisplay = snippet.textDisplay;
+
+        html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
+      });
+      html += `</div>`; 
+    }
 
     return html;
   }

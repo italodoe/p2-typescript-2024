@@ -1,4 +1,5 @@
 import fs from "fs";
+import { YOUTUBE_key } from "./env";
 const path = require("path");
 
 export const usageText = `Usage: bun run main.ts [options]
@@ -12,7 +13,27 @@ export const searchUrl: string =
   "https://www.googleapis.com/youtube/v3/search?";
 export const getCommentsUrl: string =
   "https://www.googleapis.com/youtube/v3/commentThreads?";
-export const maxN = 10;
+
+  export const maxN = 10;
+
+  export var youtubeCommentsParams: YouTubeCommentsParams = {
+    key: YOUTUBE_key,
+    videoId: undefined,
+    part: "snippet",
+    maxResults: 10,
+    pageToken: undefined,
+  };
+
+  export var youtubeVideosParams = {
+    q:undefined,
+    key: YOUTUBE_key,
+    part: "snippet",
+    type: "video",
+    maxResults: maxN,
+    videoEmbeddable: true,
+    // pageToken: undefined,
+  };
+
 
 export function forceExit(code: number, withError: boolean = true) {
   if (withError) console.error(usageText);
@@ -68,6 +89,58 @@ export interface SearchListResponse {
   pageInfo: PageInfo;
   items: Item[];
 }
+
+export interface YouTubeCommentsParams {
+    key: string | undefined;
+    videoId?: string;
+    part: string;
+    maxResults: number;
+    pageToken?: string;
+  }
+
+  export interface CommentSnippet {
+    channelId: string;
+    videoId: string;
+    textDisplay: string;
+    textOriginal: string;
+    authorDisplayName: string;
+    authorProfileImageUrl: string;
+    authorChannelUrl: string;
+    authorChannelId: {
+      value: string;
+    };
+    canRate: boolean;
+    viewerRating: string;
+    likeCount: number;
+    publishedAt: string;
+    updatedAt: string;
+  }
+
+  
+  export interface CommentThread {
+    kind: string;
+    etag: string;
+    id: string;
+    snippet: {
+      channelId: string;
+      videoId: string;
+      topLevelComment: CommentSnippet;
+      canReply: boolean;
+      totalReplyCount: number;
+      isPublic: boolean;
+    };
+  }
+
+  export interface CommentThreadListResponse {
+    kind: string;
+    etag: string;
+    nextPageToken: string;
+    pageInfo: {
+      totalResults: number;
+      resultsPerPage: number;
+    };
+    items: CommentThread[];
+  }
 
 //html
 
@@ -190,6 +263,7 @@ export const createMainItem = (
   title: string,
   date: string,
   description: string,
+  comments: string,
   nextVideoId: string,
   preVideoId: string
 ) => {
@@ -210,7 +284,9 @@ export const createMainItem = (
         </section>
 
         <section class="article-lyric article-section">
-        <div id="comments_${videoId}"> </div>
+        <div id="comments_${videoId}" class="comments-section">
+            ${comments}
+        </div>
         </section>
 
         <section class="article-title article-section">
