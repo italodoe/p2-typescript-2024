@@ -178,20 +178,7 @@ export const bodyHtml = (query: string, appList: string) => {
             <h1 class="header-h1"><span></span>${query}</h1>
             <h2 class="header-h2"><span></span></h2>
         </div>
-        <div class="header-back" id="header_back_wrapper">
-            <video
-            class=""
-            autoplay
-            muted
-            loop
-            id="header_back_video"
-            data-source="./public/video/live-"
-            data-index="0"
-            data-maxindex="36"
-            >
-            <source src="./public/video/live-3.mp4" type="video/mp4" />
-            Your browser does not support HTML5 video.
-            </video>
+
         </div>
         </header>
 
