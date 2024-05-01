@@ -1,6 +1,6 @@
 import fs from "fs";
 import { YOUTUBE_key } from "./env";
-const path = require("path");
+import path from "path";
 
 export const usageText = `Usage: bun run main.ts [options]
 
@@ -25,7 +25,7 @@ export var youtubeCommentsParams: YouTubeCommentsParams = {
   pageToken: undefined,
 };
 
-export var youtubeVideosParams = {
+export var youtubeVideosParams: YoutubeVideosParams   = {
   q: undefined,
   key: YOUTUBE_key,
   part: "snippet",
@@ -41,6 +41,16 @@ export function forceExit(code: number, withError: boolean = true) {
 }
 
 //interfaces
+
+export interface YoutubeVideosParams {
+    q?: string;
+    key: string;
+    part: string;
+    type: string;
+    maxResults: number;
+    videoEmbeddable: boolean;
+    pageToken?: string;
+  }
 
 export interface Thumbnails {
   [key: string]: {

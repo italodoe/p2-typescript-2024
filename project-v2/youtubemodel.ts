@@ -38,20 +38,11 @@ export class YoutubeManager {
   }
 
   async getYoutubeSearchResult() {
-    const response = await this.callSearchApi();
+    const response: SearchListResponse = await this.callSearchApi();
     return new YoutubeSearchResult(response, this.query);
   }
 
   async callSearchApi() {
-    const params = {
-      q: this.query,
-      key: YOUTUBE_key,
-      part: "snippet",
-      type: "video",
-      maxResults: maxN,
-      videoEmbeddable: true,
-      // pageToken: undefined,
-    };
     youtubeVideosParams.q = this.query;
     const body = await fetch(
       searchUrl + new URLSearchParams(youtubeVideosParams)
