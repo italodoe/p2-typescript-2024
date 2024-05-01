@@ -13,6 +13,7 @@ export const searchUrl: string =
   "https://www.googleapis.com/youtube/v3/search?";
 export const getCommentsUrl: string =
   "https://www.googleapis.com/youtube/v3/commentThreads?";
+export const youtubeVideoLink: string = "https://www.youtube.com/watch?v=";
 
 export const maxN = 50;
 
@@ -266,6 +267,38 @@ const navItem = `
 </nav>
 `;
 
+export const createNavItem = (
+  query: string,
+  index: string,
+  videoId: string
+) => {
+  return `
+    <nav>
+        <section id="nav_logo" class="nav-section">
+        <a title="Back to the list" class="logo-index" href="../index.html">
+    
+        <img src="../favicon.ico" style="width: 35px; height: 35px">
+        </a>
+        </section>
+        <section id="nav_link" class="nav-section">
+        <a href="#">${query}</i></a>
+    
+        </section>
+        <section id="nav_other1" class="nav-section">
+        <a href="#">${index}</a>
+        </section>
+        <section id="nav_other2" class="nav-section">
+        <a title="Go to Youtube"  class="logo-index" href="${
+          youtubeVideoLink + videoId
+        }">
+        <i class="fa-brands fa-square-youtube">
+        go
+        </i></i></a>
+        </section>
+    </nav>
+    `;
+};
+
 export const createMainItem = (
   videoId: string,
   index: string,
@@ -326,11 +359,17 @@ export const createMainItem = (
     `;
 };
 
-export const bodyItem = (mainContent: string, currentIndex: string) => {
+export const bodyItem = (
+  mainContent: string,
+  currentIndex: string,
+  query: string,
+  videoId: string
+) => {
+  const navItem = createNavItem(query, currentIndex, videoId);
   return `
     <div class="body-item">
         ${navItem}
-        <main class="list-player" id="main_list_player" data-index=${currentIndex}>
+        <main class="list-player" id="main_list_player">
             ${mainContent}
         </main>
     </div>

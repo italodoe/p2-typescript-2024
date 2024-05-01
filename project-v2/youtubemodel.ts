@@ -103,8 +103,13 @@ export class YoutubeSearchResult implements SearchListResponse {
     `;
   }
 
-  renderItemPage(videoId: string, mainItem: string) {
-    const body = bodyItem(mainItem, "2");
+  renderItemPage(
+    indexText: string,
+    mainItem: string,
+    query: string,
+    videoId: string
+  ) {
+    const body = bodyItem(mainItem, indexText, query, videoId);
 
     return `
     <!DOCTYPE html>
@@ -151,7 +156,13 @@ export class YoutubeSearchResult implements SearchListResponse {
         nextVideoId,
         preVideoId
       );
-      const itemRender = that.renderItemPage(videoId, mainItem);
+      const indexText = `${index + 1} / ${array.length} `;
+      const itemRender = that.renderItemPage(
+        indexText,
+        mainItem,
+        that.query,
+        videoId
+      );
       const filename = itemFolder + `item-page-${videoId}.html`;
       await writeFile(filename, itemRender);
     });
@@ -198,7 +209,7 @@ export class YouTubeComments {
 
         html += `<div class="comment-wrapper"><p class=comment-author>${author}</p><p class="comment-text">${textOriginal}</p></div>`;
       });
-      html += `</div>`; 
+      html += `</div>`;
     }
 
     return html;
