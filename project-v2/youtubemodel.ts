@@ -8,6 +8,7 @@ import {
   createThumbnail,
   getCommentsUrl,
   headHtml,
+  headItemHtml,
   itemFolder,
   manageFolder,
   maxN,
@@ -108,7 +109,7 @@ export class YoutubeSearchResult implements SearchListResponse {
     return `
     <!DOCTYPE html>
     <html lang="en" id="html">
-        ${headHtml}
+        ${headItemHtml}
         <body id="mainBody">
             ${body}
         </body>

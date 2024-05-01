@@ -147,9 +147,34 @@ export interface YouTubeCommentsParams {
 export const headHtml = `
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/ico" href="../favicon.ico" />
+    <link rel="icon" type="image/ico" href="./favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles/style.css">
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Project youtube api</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  `;
+
+export const headItemHtml = `
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/ico" href="../favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/style.css">
     <link rel="stylesheet" href="../styles/style-list.css">
 
     <link
@@ -175,7 +200,7 @@ export const bodyHtml = (query: string, appList: string) => {
         <body id="mainBody">
         <header class="header">
         <div class="header-wrapper scroll-reveal colorfull-two">
-            <h1 class="header-h1"><span></span>${query}</h1>
+            <h1 class="header-h1"><span>${query}</span></h1>
             <h2 class="header-h2"><span></span></h2>
         </div>
 
@@ -226,7 +251,7 @@ export const createThumbnail = (
 const navItem = `    
 <nav>
 <section id="nav_logo" class="nav-section">
-  <a href="../index.html"><i class="fa-brands fa-youtube"></i></a>
+  <a class="logo-index" href="../index.html"><i class="fa-brands fa-youtube"></i></a>
 </section>
 <section id="nav_link" class="nav-section">
   <a href="#"><i class="fa-solid fa-ghost"></i></a>
