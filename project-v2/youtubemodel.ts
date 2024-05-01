@@ -32,23 +32,40 @@ export class YoutubeManager {
 
   async generateIndex() {
     const result = await this.getYoutubeSearchResult();
-    const indexHtml = await result.render(this.query);
-    await writeFile("index.html", indexHtml);
-    return indexHtml;
+    if (result) {
+      const indexHtml = await result.render(this.query);
+      await writeFile("index.html", indexHtml);
+      return indexHtml;
+    }
+    console.error("Change API KEY");
+
   }
 
   async getYoutubeSearchResult() {
-    const response: SearchListResponse = await this.callSearchApi();
-    return new YoutubeSearchResult(response, this.query);
+    const response = await this.callSearchApi();
+    if (response) return new YoutubeSearchResult(response, this.query);
+    return null;
   }
 
   async callSearchApi() {
+    const params = {
+      q: this.query,
+      key: YOUTUBE_key,
+      part: "snippet",
+      type: "video",
+      maxResults: maxN,
+      videoEmbeddable: true,
+      // pageToken: undefined,
+    };
     youtubeVideosParams.q = this.query;
     const body = await fetch(
       searchUrl + new URLSearchParams(youtubeVideosParams)
     );
-    const response = await body.json();
-    return response;
+    if (body.status === 200) {
+      const response = await body.json();
+      return response;
+    }
+    return null;
   }
 }
 
